@@ -1,0 +1,282 @@
+
+/* ---------------- iOS 26 · Liquid Glass ---------------- */
+:root, menupopup, panel, tooltip, #urlbar, .urlbarView {
+
+  --fm-accent: light-dark(var(--fm-user-accent, #007AFF), var(--fm-user-accent, #0A84FF)) !important;
+  --fm-on-accent: #ffffff !important;
+  --fm-frame: light-dark(#EEF1F8, #05060B) !important;
+  --fm-bar: light-dark(#FFFFFF, #1C1C1E) !important;
+  --fm-field: light-dark(rgb(255 255 255 / .7), rgb(255 255 255 / .1)) !important;
+  --fm-menu: light-dark(rgb(250 250 253 / .94), rgb(30 30 34 / .93)) !important;
+  --fm-ink: light-dark(#000000, #FFFFFF) !important;
+  --fm-muted: light-dark(rgb(60 60 67 / .62), rgb(235 235 245 / .6)) !important;
+  --fm-line: light-dark(rgb(60 60 67 / .14), rgb(255 255 255 / .1)) !important;
+  --fm-hover: light-dark(rgb(0 0 0 / .05), rgb(255 255 255 / .1)) !important;
+  --fm-press: light-dark(rgb(0 0 0 / .1), rgb(255 255 255 / .16)) !important;
+  --fm-soft: light-dark(rgb(0 122 255 / .14), rgb(10 132 255 / .24)) !important;
+  --fm-radius: 26px !important;
+  --fm-font: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif !important;
+
+  /* материал «жидкое стекло» */
+  --lg-fill: light-dark(rgb(255 255 255 / .55), rgb(255 255 255 / .085));
+  --lg-fill-strong: light-dark(rgb(255 255 255 / .82), rgb(255 255 255 / .17));
+  --lg-sheen: linear-gradient(180deg, light-dark(rgb(255 255 255 / .7), rgb(255 255 255 / .13)) 0%, transparent 58%);
+  --lg-rim: inset 0 1px 0 light-dark(rgb(255 255 255 / 1), rgb(255 255 255 / .34)),
+            inset 0 -1px 0 light-dark(rgb(255 255 255 / .55), rgb(255 255 255 / .07)),
+            inset 1px 0 0 light-dark(rgb(255 255 255 / .6), rgb(255 255 255 / .09)),
+            inset -1px 0 0 light-dark(rgb(255 255 255 / .6), rgb(255 255 255 / .09));
+  --lg-drop: 0 8px 24px light-dark(rgb(40 50 90 / .14), rgb(0 0 0 / .38)),
+             0 1px 3px light-dark(rgb(40 50 90 / .1), rgb(0 0 0 / .35));
+  --lg-blur: blur(22px) saturate(190%);
+  --lg-wall:
+    radial-gradient(55% 75% at 0% 0%, light-dark(rgb(122 170 255 / .55), rgb(10 132 255 / .34)), transparent 70%),
+    radial-gradient(45% 70% at 100% 0%, light-dark(rgb(196 160 255 / .55), rgb(94 92 230 / .38)), transparent 70%),
+    radial-gradient(55% 60% at 100% 100%, light-dark(rgb(255 172 200 / .5), rgb(255 55 95 / .2)), transparent 70%),
+    radial-gradient(50% 60% at 0% 100%, light-dark(rgb(140 228 255 / .5), rgb(64 200 224 / .18)), transparent 70%),
+    light-dark(#EEF1F8, #05060B);
+
+  --fm-ring: light-dark(rgb(0 122 255 / .34), rgb(10 132 255 / .42)) !important;
+  --fm-ring-focus: light-dark(rgb(0 122 255 / .62), rgb(10 132 255 / .72)) !important;
+  --fm-ring-glow: light-dark(rgb(0 122 255 / .1), rgb(10 132 255 / .16)) !important;
+  --panel-background-color: var(--fm-menu) !important;
+  --arrowpanel-background: var(--fm-menu) !important;
+  --urlbarview-background-color-selected: light-dark(rgb(0 0 0 / .06), rgb(255 255 255 / .12)) !important;
+}
+/* рамка окна прозрачная: всё, что раньше было «чёрным фоном», теперь показывает обои */
+:root {
+  --fm-frame: transparent !important;
+  --sidebar-background-color: transparent !important;
+  --panel-sidebar-background-color: transparent !important;
+  --toolbox-background-color: transparent !important;
+  --toolbox-background-color-inactive: transparent !important;
+  --toolbar-background-color: transparent !important;
+  --toolbar-bgcolor: transparent !important;
+}
+:root:not([lwtheme]) :is(#sidebar-main, #sidebar-box, #panel-sidebar-select-box, #panel-sidebar-select-box > *, #sidebar-main > *, #vertical-tabs, #tabbrowser-tabs[orient="vertical"], .sidebar-panel-header, #sidebar-header) {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* ---------- обои под окном: видны вокруг страницы и сквозь стекло ---------- */
+:root:not([lwtheme]) :is(#navigator-toolbox, #nav-bar, #PersonalToolbar, #TabsToolbar, #browser, #sidebar-main, #sidebar-box, #panel-sidebar-select-box, #nora-statusbar) {
+  background-color: transparent !important;
+}
+:root:not([lwtheme]) :is(#navigator-toolbox, #browser) {
+  background: var(--lg-wall) !important;
+  background-attachment: fixed !important;
+}
+
+/* страница — «плавающая» карточка с большим скруглением */
+:root:not([inDOMFullscreen], [inFullscreen]) #tabbrowser-tabpanels .browserContainer {
+  border-radius: 26px !important;
+  box-shadow: 0 0 0 1px light-dark(rgb(255 255 255 / .7), rgb(255 255 255 / .08)),
+              0 12px 40px light-dark(rgb(40 50 90 / .16), rgb(0 0 0 / .55)) !important;
+}
+
+/* ---------- панель навигации: парящая стеклянная капсула, как в Safari ---------- */
+#nav-bar {
+  margin: 6px 8px 6px !important;
+  padding: 3px 6px !important;
+  border-radius: 999px !important;
+  background-color: var(--lg-fill) !important;
+  background-image: var(--lg-sheen) !important;
+  box-shadow: var(--lg-rim), var(--lg-drop) !important;
+  /* без backdrop-filter: он сделал бы панель отдельным слоем, и выпадающие
+     списки адресной строки могли бы уйти под страницу. Под панелью и так
+     плавный градиент, размытие там незаметно */
+}
+:root[sizemode="maximized"] #nav-bar, :root[sizemode="normal"] #nav-bar { border-top: 0 !important; }
+
+/* кнопки: без заливки, при наведении — маленькая стеклянная «капля» */
+toolbar .toolbarbutton-1 {
+  --toolbarbutton-hover-background: light-dark(rgb(255 255 255 / .7), rgb(255 255 255 / .14)) !important;
+  --toolbarbutton-active-background: light-dark(rgb(255 255 255 / .95), rgb(255 255 255 / .22)) !important;
+}
+toolbar .toolbarbutton-1:not([disabled]):hover > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack) {
+  box-shadow: var(--lg-rim) !important;
+}
+toolbar .toolbarbutton-1 > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack) {
+  transition: background-color .2s ease, scale .25s cubic-bezier(.3, 1.6, .5, 1) !important;
+}
+toolbar .toolbarbutton-1:not([disabled]):active > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack) { scale: .88; }
+toolbarbutton:is([open], [checked]) > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack) {
+  background-color: var(--lg-fill-strong) !important;
+  fill: var(--fm-accent) !important;
+  box-shadow: var(--lg-rim) !important;
+}
+
+/* ---------- адресная строка: стеклянная капсула внутри капсулы ---------- */
+#urlbar-background, .urlbar-background {
+  background-color: light-dark(rgb(255 255 255 / .62), rgb(255 255 255 / .09)) !important;
+  background-image: var(--lg-sheen) !important;
+  box-shadow: var(--lg-rim) !important;
+}
+#urlbar > :is(#urlbar-background, .urlbar-background),
+.urlbar > .urlbar-background {
+  box-shadow: var(--lg-rim), 0 0 16px var(--fm-ring-glow) !important;
+}
+#urlbar:is([focused], [open], [popover-open], [breakout-extend], :focus-within) > :is(#urlbar-background, .urlbar-background),
+.urlbar:is([focused], [open], [popover-open], :focus-within) > .urlbar-background {
+  box-shadow: var(--lg-rim), 0 0 22px var(--fm-ring-glow) !important;
+}
+#urlbar[open] > :is(#urlbar-background, .urlbar-background) {
+  background-color: var(--fm-menu) !important;
+  background-image: var(--lg-sheen) !important;
+  box-shadow: var(--lg-rim), 0 24px 60px light-dark(rgb(40 50 90 / .22), rgb(0 0 0 / .6)) !important;
+  backdrop-filter: blur(30px) saturate(180%) !important;
+  border: 0 !important;
+  border-radius: 28px !important;
+}
+.urlbarView-row:not([selected]):hover > .urlbarView-row-inner { background: var(--fm-hover) !important; }
+.urlbarView-row[selected] > .urlbarView-row-inner {
+  background: light-dark(rgb(0 0 0 / .06), rgb(255 255 255 / .12)) !important;
+  box-shadow: var(--lg-rim) !important;
+}
+.urlbarView-row[selected] :is(.urlbarView-title, .urlbarView-action, .urlbarView-url) { color: var(--fm-ink) !important; }
+.urlbarView-row[selected] .urlbarView-action { color: var(--fm-accent) !important; }
+.urlbarView-favicon {
+  border-radius: 10px !important;
+  background: var(--lg-fill-strong) !important;
+  box-shadow: var(--lg-rim) !important;
+}
+.urlbarView-row[selected] .urlbarView-favicon { background: var(--fm-accent) !important; fill: #fff !important; }
+
+/* ---------- вкладки: стеклянные капли ---------- */
+.tabbrowser-tab > .tab-stack > .tab-background { border-radius: 999px !important; }
+#tabbrowser-tabs[orient="vertical"] .tabbrowser-tab > .tab-stack > .tab-background { border-radius: 16px !important; }
+.tabbrowser-tab:not([selected], [multiselected]):hover > .tab-stack > .tab-background {
+  background: var(--lg-fill) !important;
+  box-shadow: var(--lg-rim) !important;
+}
+.tabbrowser-tab:is([selected], [multiselected]) > .tab-stack > .tab-background {
+  background-color: var(--lg-fill-strong) !important;
+  background-image: var(--lg-sheen) !important;
+  box-shadow: var(--lg-rim), var(--lg-drop) !important;
+}
+.tabbrowser-tab[selected] .tab-label { color: var(--fm-ink) !important; font-weight: 600 !important; }
+.tab-close-button:hover { background: var(--lg-fill-strong) !important; }
+#tabs-newtab-button > .toolbarbutton-icon, #vertical-tabs-newtab-button {
+  border-radius: 999px !important;
+}
+
+/* ---------- закладки: просто текст, как в Safari; при наведении — стекло ---------- */
+#PlacesToolbarItems > .bookmark-item {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+#PlacesToolbarItems > .bookmark-item:hover {
+  background: var(--lg-fill) !important;
+  box-shadow: var(--lg-rim) !important;
+}
+#PlacesToolbarItems > .bookmark-item[open] {
+  background: var(--lg-fill-strong) !important;
+  color: var(--fm-ink) !important;
+  box-shadow: var(--lg-rim) !important;
+}
+
+/* ---------- боковые панели: стеклянные кнопки ----------
+   На саму панель с сайтом никаких эффектов: внутри живая страница. */
+.panel-sidebar-panel:hover, .panel-sidebar-actions:hover { background-color: var(--lg-fill) !important; }
+.panel-sidebar-panel[data-checked="true"] {
+  background-color: var(--lg-fill-strong) !important;
+  box-shadow: var(--lg-rim) !important;
+}
+#sidebar-main .tools-and-extensions moz-button, #sidebar-main button-group moz-button { border-radius: 14px !important; }
+
+/* ---------- меню и панели: матовое стекло с кантом ---------- */
+menupopup::part(content), panel::part(content) {
+  background-color: var(--fm-menu) !important;
+  background-image: var(--lg-sheen) !important;
+  border: 0 !important;
+  border-radius: 26px !important;
+  box-shadow: var(--lg-rim), 0 0 0 .5px light-dark(rgb(0 0 0 / .08), rgb(0 0 0 / .6)) !important;
+}
+menupopup::part(content) { border-radius: 20px !important; }
+menupopup > :is(menuitem, menu) { border-radius: 12px !important; }
+menupopup > :is(menuitem, menu):is([_moz-menuactive], :hover):not([disabled]) {
+  background-color: light-dark(rgb(0 0 0 / .06), rgb(255 255 255 / .12)) !important;
+  color: var(--fm-ink) !important;
+}
+.subviewbutton:not([disabled]):hover,
+#appMenu-mainView .subviewbutton:not([disabled]):hover {
+  background: light-dark(rgb(0 0 0 / .05), rgb(255 255 255 / .1)) !important;
+}
+tooltip {
+  background-color: var(--fm-menu) !important;
+  background-image: var(--lg-sheen) !important;
+  box-shadow: var(--lg-rim) !important;
+  border: 0 !important;
+}
+
+/* главное меню: иконки — объёмные квадраты, как значки iOS 26 */
+#appMenu-new-tab-button2 { --fm-tile: #0A84FF !important; }
+#appMenu-new-window-button2, #appMenu-new-classic-window-button { --fm-tile: #40C8E0 !important; }
+#appMenu-new-private-window-button2 { --fm-tile: #5E5CE6 !important; }
+#appMenu-history-button { --fm-tile: #FF9F0A !important; }
+#appMenu-bookmarks-button { --fm-tile: #FFCC00 !important; }
+#appMenu-downloads-button { --fm-tile: #30D158 !important; }
+#appMenu-passwords-button { --fm-tile: #8E8E93 !important; }
+#appMenu-extensions-themes-button, #appMenu-unified-extensions-button { --fm-tile: #BF5AF2 !important; }
+#appMenu-print-button2 { --fm-tile: #8E8E93 !important; }
+#appMenu-save-file-button2 { --fm-tile: #0A84FF !important; }
+#appMenu-translate-button { --fm-tile: #40C8E0 !important; }
+#appMenu-find-button2 { --fm-tile: #0A84FF !important; }
+#appMenu-settings-button { --fm-tile: #8E8E93 !important; }
+#appMenu-more-button2 { --fm-tile: #8E8E93 !important; }
+#appMenu-help-button2 { --fm-tile: #0A84FF !important; }
+#appMenu-profiles-button, #appMenu-create-profile-button { --fm-tile: #FF375F !important; }
+#appMenu-tab-groups-button { --fm-tile: #40C8E0 !important; }
+#appMenu-quit-button2 { --fm-tile: #FF453A !important; }
+#appMenu-fullscreen-button2 { --fm-tile: #8E8E93 !important; }
+#appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon {
+  border-radius: 9px !important;
+  width: 30px !important; height: 30px !important; padding: 7px !important;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--fm-tile) 78%, white), var(--fm-tile) 70%) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .45), inset 0 -1px 0 rgb(0 0 0 / .12),
+              0 2px 6px color-mix(in srgb, var(--fm-tile) 35%, transparent) !important;
+}
+#appMenu-mainView .subviewbutton { border-radius: 14px !important; min-height: 44px !important; }
+#appMenu-mainView .subviewbutton > .toolbarbutton-text { font-weight: 500 !important; font-size: 14px !important; }
+
+/* загрузки, расширения, разрешения */
+#downloadsListBox > richlistitem[selected] { background: var(--lg-fill-strong) !important; box-shadow: var(--lg-rim) !important; }
+.protections-popup-section, .identity-popup-section { background: var(--lg-fill) !important; box-shadow: var(--lg-rim) !important; }
+moz-toggle { --toggle-background-color-pressed: #34C759 !important; }
+button.primary, .popup-notification-primary-button {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--fm-accent) 80%, white), var(--fm-accent) 65%) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .4) !important;
+}
+
+/* ---------- функции Floorp Modern ---------- */
+.fm-toast {
+  background-color: light-dark(rgb(255 255 255 / .72), rgb(40 40 46 / .6)) !important;
+  background-image: var(--lg-sheen) !important;
+  box-shadow: var(--lg-rim), var(--lg-drop) !important;
+  backdrop-filter: blur(26px) saturate(190%) !important;
+  border: 0 !important;
+}
+.fm-toast[data-kind="ok"] .fm-toast-dot { background: #30D158 !important; }
+.fm-nowbar {
+  background-color: light-dark(rgb(255 255 255 / .72), rgb(40 40 46 / .6)) !important;
+  background-image: var(--lg-sheen) !important;
+  box-shadow: var(--lg-rim), var(--lg-drop) !important;
+  backdrop-filter: blur(26px) saturate(190%) !important;
+  border: 0 !important;
+}
+.fm-progress-fill { background: linear-gradient(90deg, #0A84FF, #5E5CE6, #FF375F) !important; box-shadow: 0 0 10px rgb(10 132 255 / .7) !important; }
+findbar { background: transparent !important; }
+/* ---------- плашка доступа к экрану: стеклянная капсула ---------- */
+@-moz-document url("chrome://browser/content/webrtcIndicator.xhtml") {
+  body {
+    background: light-dark(rgb(250 250 253 / .96), rgb(34 34 40 / .96)) !important;
+    background-image: linear-gradient(180deg, light-dark(rgb(255 255 255 / .8), rgb(255 255 255 / .12)), transparent 60%) !important;
+    border: 0 !important;
+    box-shadow: inset 0 1px 0 light-dark(#fff, rgb(255 255 255 / .3)), inset 0 0 0 1px light-dark(rgb(0 0 0 / .08), rgb(255 255 255 / .08)) !important;
+  }
+  .stop-button {
+    background: linear-gradient(180deg, #3D9BFF, #0A84FF 65%) !important;
+    color: #fff !important;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / .4) !important;
+  }
+}
+

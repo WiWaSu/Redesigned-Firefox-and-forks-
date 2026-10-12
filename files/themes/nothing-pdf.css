@@ -1,0 +1,22 @@
+
+/* ---------------- Тема: Nothing ---------------- */
+:root:has(#outerContainer #viewerContainer) {
+  & {
+    --x-accent: var(--fm-user-accent, #D71921) !important;
+    --x-on-accent: #ffffff !important;
+    --x-ground: light-dark(#f2f2f2, #000000) !important;
+    --x-rail: light-dark(#f2f2f2, #000000) !important;
+    --x-bar: light-dark(#ffffff, #0d0d0d) !important;
+    --x-well: light-dark(#ffffff, #000000) !important;
+    --x-field: light-dark(#ffffff, #000000) !important;
+    --x-line: light-dark(rgb(0 0 0 / .25), rgb(255 255 255 / .22)) !important;
+    --x-ink: light-dark(#000000, #ffffff) !important;
+    --x-muted: light-dark(#666666, #8a8a8a) !important;
+    --x-radius: 10px !important;
+  }
+  & #toolbarViewerLeft,
+  & #toolbarViewerMiddle,
+  & #editorModeButtons,
+  & #toolbarViewerRight > .toolbarHorizontalGroup:not(#editorModeButtons) { border-radius: 999px !important; }
+  & .toolbarButton:not(.labeled) { border-radius: 999px !important; }
+}

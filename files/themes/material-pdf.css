@@ -1,0 +1,22 @@
+
+/* ---------------- Тема: Material You ---------------- */
+:root:has(#outerContainer #viewerContainer) {
+  & {
+    --x-accent: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 80%, black), color-mix(in srgb, var(--fm-user-accent, AccentColor) 55%, white)) !important;
+    --x-on-accent: light-dark(#ffffff, #10131a) !important;
+    --x-ground: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 5%, #fbf9fd), color-mix(in srgb, var(--fm-user-accent, AccentColor) 7%, #111317)) !important;
+    --x-rail: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 5%, #fbf9fd), color-mix(in srgb, var(--fm-user-accent, AccentColor) 7%, #111317)) !important;
+    --x-bar: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 8%, #ffffff), color-mix(in srgb, var(--fm-user-accent, AccentColor) 12%, #1b1d22)) !important;
+    --x-well: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 14%, #ffffff), color-mix(in srgb, var(--fm-user-accent, AccentColor) 18%, #24272d)) !important;
+    --x-field: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 14%, #ffffff), color-mix(in srgb, var(--fm-user-accent, AccentColor) 18%, #22252b)) !important;
+    --x-line: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 14%, transparent), color-mix(in srgb, var(--fm-user-accent, AccentColor) 18%, transparent)) !important;
+    --x-ink: light-dark(#1b1b1f, #e4e2e6) !important;
+    --x-muted: light-dark(#5e5e66, #a3a3ad) !important;
+    --x-radius: 10px !important;
+  }
+  & #toolbarViewerLeft,
+  & #toolbarViewerMiddle,
+  & #editorModeButtons,
+  & #toolbarViewerRight > .toolbarHorizontalGroup:not(#editorModeButtons) { border-radius: 999px !important; }
+  & .toolbarButton:not(.labeled) { border-radius: 999px !important; }
+}

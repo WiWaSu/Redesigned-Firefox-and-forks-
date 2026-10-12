@@ -1,0 +1,22 @@
+
+/* ---------------- Тема: macOS ---------------- */
+:root:has(#outerContainer #viewerContainer) {
+  & {
+    --x-accent: light-dark(var(--fm-user-accent, #007AFF), var(--fm-user-accent, #0A84FF)) !important;
+    --x-on-accent: #ffffff !important;
+    --x-ground: light-dark(#e7e5ea, #1f1e23) !important;
+    --x-rail: light-dark(#e7e5ea, #1f1e23) !important;
+    --x-bar: light-dark(#f6f5f8, #2a292f) !important;
+    --x-well: light-dark(#ffffff, #38373d) !important;
+    --x-field: light-dark(#ffffff, #38373d) !important;
+    --x-line: light-dark(rgb(0 0 0 / .1), rgb(255 255 255 / .1)) !important;
+    --x-ink: light-dark(#1d1d1f, #f5f5f7) !important;
+    --x-muted: light-dark(#6e6e73, #98989d) !important;
+    --x-radius: 10px !important;
+  }
+  & #toolbarViewerLeft,
+  & #toolbarViewerMiddle,
+  & #editorModeButtons,
+  & #toolbarViewerRight > .toolbarHorizontalGroup:not(#editorModeButtons) { border-radius: 7px !important; }
+  & .toolbarButton:not(.labeled) { border-radius: 7px !important; }
+}

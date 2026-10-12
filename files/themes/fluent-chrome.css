@@ -1,0 +1,78 @@
+
+/* ---------------- Тема: Windows 11 ---------------- */
+:root, menupopup, panel, tooltip, #urlbar, .urlbarView {
+  --fm-accent: light-dark(var(--fm-user-accent, AccentColor), color-mix(in srgb, var(--fm-user-accent, AccentColor) 70%, white)) !important;
+  --fm-on-accent: light-dark(#ffffff, #000000) !important;
+  --fm-frame: light-dark(#f3f3f3, #202020) !important;
+  --fm-bar: light-dark(#fbfbfb, #2b2b2b) !important;
+  --fm-field: light-dark(#ffffff, #2d2d2d) !important;
+  --fm-menu: light-dark(#f9f9f9, #2c2c2c) !important;
+  --fm-ink: light-dark(#1a1a1a, #ffffff) !important;
+  --fm-muted: light-dark(#5f5f5f, #c5c5c5) !important;
+  --fm-line: light-dark(rgb(0 0 0 / .08), rgb(255 255 255 / .08)) !important;
+  --fm-hover: light-dark(rgb(0 0 0 / .04), rgb(255 255 255 / .06)) !important;
+  --fm-press: light-dark(rgb(0 0 0 / .08), rgb(255 255 255 / .04)) !important;
+  --fm-soft: color-mix(in srgb, var(--fm-user-accent, AccentColor) 14%, transparent) !important;
+  --fm-radius: 8px !important;
+  --fm-font: "Segoe UI Variable Text", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif !important;
+  --fm-ring: color-mix(in srgb, var(--fm-accent) 40%, transparent) !important;
+  --fm-ring-focus: color-mix(in srgb, var(--fm-accent) 65%, transparent) !important;
+  --fm-ring-glow: color-mix(in srgb, var(--fm-accent) 10%, transparent) !important;
+  --panel-background-color: var(--fm-menu) !important;
+  --arrowpanel-background: var(--fm-menu) !important;
+  --panel-border-radius: 8px !important;
+  --arrowpanel-border-radius: 8px !important;
+  --menuitem-border-radius: 4px !important;
+  --arrowpanel-menuitem-border-radius: 4px !important;
+  --urlbarview-border-radius: 8px !important;
+  --toolbarbutton-border-radius: 4px !important;
+  --tab-border-radius: 6px !important;
+  --urlbarview-background-color-selected: var(--fm-soft) !important;
+}
+:root:not([inDOMFullscreen], [inFullscreen]) #tabbrowser-tabpanels .browserContainer { border-radius: var(--fm-radius) !important; }
+menupopup::part(content), panel::part(content) {
+  border-radius: 8px !important; background-color: var(--fm-menu) !important; background-image: none !important;
+}
+menupopup > :is(menuitem, menu), .subviewbutton, #appMenu-mainView .subviewbutton { border-radius: 4px !important; }
+.tabbrowser-tab > .tab-stack > .tab-background { border-radius: 6px !important; }
+#urlbar-background, .urlbar-background { border-radius: 4px !important; }
+#urlbar[open] > :is(#urlbar-background, .urlbar-background) { border-radius: 8px !important; }
+toolbar .toolbarbutton-1 > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack, .toolbarbutton-text),
+#PlacesToolbarItems > .bookmark-item, .urlbarView-row-inner, .tab-close-button { border-radius: 4px !important; }
+.urlbarView-favicon { border-radius: 4px !important; }
+#appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon {
+  border-radius: 4px !important; background: transparent !important;
+}
+moz-toggle { --toggle-background-color-pressed: var(--fm-accent) !important; }
+.fm-nowbar, .fm-toast { border-radius: 8px !important; }
+
+
+#appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon { box-shadow: none !important; }
+@media (prefers-color-scheme: light) {
+  #appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon { filter: invert(1) !important; }
+}
+
+/* Fluent: выделение — тонкий акцентный «индикатор» слева, как в меню Windows 11 */
+menupopup > :is(menuitem, menu):is([_moz-menuactive], :hover):not([disabled]),
+.subviewbutton:not([disabled]):hover, #appMenu-mainView .subviewbutton:not([disabled]):hover {
+  background-color: var(--fm-hover) !important; color: var(--fm-ink) !important;
+}
+.tabbrowser-tab[selected] > .tab-stack > .tab-background {
+  background: var(--fm-bar) !important;
+  box-shadow: 0 0 0 1px var(--fm-line), 0 1px 2px light-dark(rgb(0 0 0 / .06), rgb(0 0 0 / .4)) !important;
+}
+.tabbrowser-tab[selected] .tab-label { color: var(--fm-ink) !important; }
+#tabbrowser-tabs[orient="vertical"] .tabbrowser-tab[selected] > .tab-stack > .tab-background {
+  box-shadow: inset 3px 0 0 var(--fm-accent), 0 0 0 1px var(--fm-line) !important;
+}
+#urlbar-background, .urlbar-background {
+  background-color: var(--fm-field) !important;
+  box-shadow: inset 0 -1px 0 light-dark(rgb(0 0 0 / .14), rgb(255 255 255 / .1)) !important;
+}
+#urlbar:is([focused], [open]) > :is(#urlbar-background, .urlbar-background) {
+  box-shadow: inset 0 -2px 0 var(--fm-accent) !important;
+}
+#PlacesToolbarItems > .bookmark-item { background: transparent !important; box-shadow: none !important; }
+#PlacesToolbarItems > .bookmark-item:hover { background: var(--fm-hover) !important; }
+.tabbrowser-tab .tab-label, #urlbar-input { font-size: 12.5px !important; }
+

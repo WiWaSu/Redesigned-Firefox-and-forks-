@@ -1,0 +1,92 @@
+
+/* ---------------- Тема: macOS ---------------- */
+@-moz-document url-prefix("about:"), url-prefix("chrome://browser/content/"), url-prefix("chrome://mozapps/"), url-prefix("chrome://global/content/") {
+  :root {
+    --fm-accent: light-dark(var(--fm-user-accent, #007AFF), var(--fm-user-accent, #0A84FF)) !important;
+    --fm-on-accent: #ffffff !important;
+    --fm-frame: light-dark(#e7e5ea, #1f1e23) !important;
+    --fm-bar: light-dark(#f6f5f8, #2a292f) !important;
+    --fm-field: light-dark(#ffffff, #38373d) !important;
+    --fm-menu: light-dark(rgb(246 245 248 / .97), rgb(40 39 44 / .97)) !important;
+    --fm-ink: light-dark(#1d1d1f, #f5f5f7) !important;
+    --fm-muted: light-dark(#6e6e73, #98989d) !important;
+    --fm-line: light-dark(rgb(0 0 0 / .1), rgb(255 255 255 / .1)) !important;
+    --fm-hover: light-dark(rgb(0 0 0 / .05), rgb(255 255 255 / .07)) !important;
+    --fm-press: light-dark(rgb(0 0 0 / .1), rgb(255 255 255 / .12)) !important;
+    --fm-soft: light-dark(rgb(0 122 255 / .14), rgb(10 132 255 / .24)) !important;
+    --fm-radius: 12px !important;
+    --fm-font: "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif !important;
+    --color-accent-primary: var(--fm-accent) !important;
+    --button-background-color-primary: var(--fm-accent) !important;
+    --button-text-color-primary: var(--fm-on-accent) !important;
+    --link-color: var(--fm-accent) !important;
+    --focus-outline-color: var(--fm-accent) !important;
+    --toggle-background-color-pressed: var(--fm-accent) !important;
+    --page-nav-button-background-color-selected: var(--fm-soft) !important;
+    --page-nav-button-text-color-selected: var(--fm-accent) !important;
+    --card-border-radius: 12px !important;
+    --box-border-radius: 12px !important;
+    --button-border-radius: 7px !important;
+    --input-text-border-radius: 10px !important;
+    --select-border-radius: 7px !important;
+    --page-nav-button-border-radius: 6px !important;
+  }
+  :is(setting-group, groupbox):not([hidden]), .card, .addon.card, moz-card { border-radius: 12px !important; }
+  button:not(.ghost-button):not([type="icon"]), select, menulist, input[type="search"], input[type="text"] { border-radius: 7px !important; }
+  .category, .page-nav-button { border-radius: 6px !important; }
+}
+
+@-moz-document url-prefix("chrome://noraneko-settings/") {
+  :root, :root[data-theme], .floorp-standard-ui {
+    --fm-accent: light-dark(var(--fm-user-accent, #007AFF), var(--fm-user-accent, #0A84FF)) !important;
+    --fm-on-accent: #ffffff !important;
+    --fm-frame: light-dark(#e7e5ea, #1f1e23) !important;
+    --fm-bar: light-dark(#f6f5f8, #2a292f) !important;
+    --fm-field: light-dark(#ffffff, #38373d) !important;
+    --fm-menu: light-dark(rgb(246 245 248 / .97), rgb(40 39 44 / .97)) !important;
+    --fm-ink: light-dark(#1d1d1f, #f5f5f7) !important;
+    --fm-muted: light-dark(#6e6e73, #98989d) !important;
+    --fm-line: light-dark(rgb(0 0 0 / .1), rgb(255 255 255 / .1)) !important;
+    --fm-hover: light-dark(rgb(0 0 0 / .05), rgb(255 255 255 / .07)) !important;
+    --fm-press: light-dark(rgb(0 0 0 / .1), rgb(255 255 255 / .12)) !important;
+    --fm-soft: light-dark(rgb(0 122 255 / .14), rgb(10 132 255 / .24)) !important;
+    --fm-radius: 12px !important;
+    --fm-font: "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif !important;
+    --floorp-brand: var(--fm-accent) !important;
+    --floorp-action: var(--fm-accent) !important;
+    --floorp-focus: var(--fm-accent) !important;
+    --floorp-switch-on: var(--fm-accent) !important;
+    --chakra-colors-purple-solid: var(--fm-accent) !important;
+    --chakra-colors-purple-fg: var(--fm-accent) !important;
+    --chakra-colors-purple-focus-ring: var(--fm-accent) !important;
+    --chakra-colors-purple-subtle: var(--fm-soft) !important;
+  }
+}
+
+@-moz-document url-prefix("chrome://noraneko-newtab/"), url("about:newtab"), url("about:home") {
+
+  html { background: #1a1030 !important; }
+  /* обои в духе macOS: тёплые и холодные волны */
+  #root::before {
+    animation: none !important;
+    background:
+      radial-gradient(70% 50% at 20% 85%, rgb(255 140 60 / .85), transparent 65%),
+      radial-gradient(60% 55% at 85% 20%, rgb(90 120 255 / .85), transparent 65%),
+      radial-gradient(55% 50% at 60% 60%, rgb(200 70 160 / .7), transparent 70%),
+      linear-gradient(170deg, #1d1440, #3a1d5c 50%, #20123a) !important;
+  }
+  .absolute.top-4.right-4 > div > .flex { flex-direction: column-reverse !important; gap: 0 !important; }
+  .absolute.top-4.right-4 .flex-col.text-right > div { font-size: 20px !important; font-weight: 600 !important; color: rgb(255 255 255 / .9) !important; }
+  .absolute.top-4.right-4 .tabular-nums {
+    font-weight: 600 !important; font-size: clamp(100px, 12vw, 180px) !important;
+    letter-spacing: -0.02em !important; color: rgb(255 255 255 / .92) !important;
+    text-shadow: 0 2px 30px rgb(0 0 0 / .25) !important;
+  }
+  .absolute.top-4.right-4 .tabular-nums > .animate-pulse { animation: none !important; opacity: 1 !important; }
+  .group.cursor-pointer:has(input[readonly]) {
+    border-radius: 14px !important; border: 0 !important;
+    background: rgb(255 255 255 / .16) !important; backdrop-filter: blur(24px) saturate(180%) !important;
+    box-shadow: inset 0 0 0 .5px rgb(255 255 255 / .3), 0 16px 40px rgb(0 0 0 / .3) !important;
+  }
+
+}

@@ -1,0 +1,61 @@
+
+/* ---------------- Тема: Material You ---------------- */
+:root, menupopup, panel, tooltip, #urlbar, .urlbarView {
+  --fm-accent: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 80%, black), color-mix(in srgb, var(--fm-user-accent, AccentColor) 55%, white)) !important;
+  --fm-on-accent: light-dark(#ffffff, #10131a) !important;
+  --fm-frame: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 5%, #fbf9fd), color-mix(in srgb, var(--fm-user-accent, AccentColor) 7%, #111317)) !important;
+  --fm-bar: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 10%, #ffffff), color-mix(in srgb, var(--fm-user-accent, AccentColor) 12%, #1b1d22)) !important;
+  --fm-field: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 14%, #ffffff), color-mix(in srgb, var(--fm-user-accent, AccentColor) 18%, #22252b)) !important;
+  --fm-menu: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 8%, #f7f5fa), color-mix(in srgb, var(--fm-user-accent, AccentColor) 14%, #202328)) !important;
+  --fm-ink: light-dark(#1b1b1f, #e4e2e6) !important;
+  --fm-muted: light-dark(#5e5e66, #a3a3ad) !important;
+  --fm-line: light-dark(color-mix(in srgb, var(--fm-user-accent, AccentColor) 14%, transparent), color-mix(in srgb, var(--fm-user-accent, AccentColor) 18%, transparent)) !important;
+  --fm-hover: color-mix(in srgb, var(--fm-user-accent, AccentColor) 12%, transparent) !important;
+  --fm-press: color-mix(in srgb, var(--fm-user-accent, AccentColor) 20%, transparent) !important;
+  --fm-soft: color-mix(in srgb, var(--fm-user-accent, AccentColor) 24%, transparent) !important;
+  --fm-radius: 28px !important;
+  --fm-font: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif !important;
+  --fm-ring: color-mix(in srgb, var(--fm-accent) 40%, transparent) !important;
+  --fm-ring-focus: color-mix(in srgb, var(--fm-accent) 65%, transparent) !important;
+  --fm-ring-glow: color-mix(in srgb, var(--fm-accent) 10%, transparent) !important;
+  --panel-background-color: var(--fm-menu) !important;
+  --arrowpanel-background: var(--fm-menu) !important;
+  --panel-border-radius: 24px !important;
+  --arrowpanel-border-radius: 24px !important;
+  --menuitem-border-radius: 999px !important;
+  --arrowpanel-menuitem-border-radius: 999px !important;
+  --urlbarview-border-radius: 24px !important;
+  --toolbarbutton-border-radius: 999px !important;
+  --tab-border-radius: 999px !important;
+  --urlbarview-background-color-selected: var(--fm-soft) !important;
+}
+:root:not([inDOMFullscreen], [inFullscreen]) #tabbrowser-tabpanels .browserContainer { border-radius: var(--fm-radius) !important; }
+menupopup::part(content), panel::part(content) {
+  border-radius: 24px !important; background-color: var(--fm-menu) !important; background-image: none !important;
+}
+menupopup > :is(menuitem, menu), .subviewbutton, #appMenu-mainView .subviewbutton { border-radius: 999px !important; }
+.tabbrowser-tab > .tab-stack > .tab-background { border-radius: 999px !important; }
+#urlbar-background, .urlbar-background { border-radius: 999px !important; }
+#urlbar[open] > :is(#urlbar-background, .urlbar-background) { border-radius: 24px !important; }
+toolbar .toolbarbutton-1 > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack, .toolbarbutton-text),
+#PlacesToolbarItems > .bookmark-item, .urlbarView-row-inner, .tab-close-button { border-radius: 999px !important; }
+.urlbarView-favicon { border-radius: 999px !important; }
+#appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon {
+  border-radius: 50% !important; background: var(--fm-accent) !important;
+}
+moz-toggle { --toggle-background-color-pressed: var(--fm-accent) !important; }
+.fm-nowbar, .fm-toast { border-radius: 999px !important; }
+
+
+
+/* вкладки и закладки — тональные «таблетки», как в Android 16 */
+.tabbrowser-tab[selected] > .tab-stack > .tab-background {
+  background: var(--fm-soft) !important; box-shadow: none !important;
+}
+.tabbrowser-tab[selected] .tab-label { color: var(--fm-ink) !important; font-weight: 600 !important; }
+#urlbar-background, .urlbar-background { background-color: var(--fm-field) !important; box-shadow: none !important; }
+#urlbar { --urlbar-min-height: 42px !important; }
+#nav-bar { padding-block: 6px !important; }
+menupopup > :is(menuitem, menu):is([_moz-menuactive], :hover):not([disabled]) { background-color: var(--fm-soft) !important; }
+#appMenu-mainView .subviewbutton:not([disabled]):hover { background: var(--fm-soft) !important; }
+

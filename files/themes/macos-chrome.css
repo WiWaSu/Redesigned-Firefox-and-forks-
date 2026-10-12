@@ -1,0 +1,88 @@
+
+/* ---------------- Тема: macOS ---------------- */
+:root, menupopup, panel, tooltip, #urlbar, .urlbarView {
+  --fm-accent: light-dark(var(--fm-user-accent, #007AFF), var(--fm-user-accent, #0A84FF)) !important;
+  --fm-on-accent: #ffffff !important;
+  --fm-frame: light-dark(#e7e5ea, #1f1e23) !important;
+  --fm-bar: light-dark(#f6f5f8, #2a292f) !important;
+  --fm-field: light-dark(#ffffff, #38373d) !important;
+  --fm-menu: light-dark(rgb(246 245 248 / .97), rgb(40 39 44 / .97)) !important;
+  --fm-ink: light-dark(#1d1d1f, #f5f5f7) !important;
+  --fm-muted: light-dark(#6e6e73, #98989d) !important;
+  --fm-line: light-dark(rgb(0 0 0 / .1), rgb(255 255 255 / .1)) !important;
+  --fm-hover: light-dark(rgb(0 0 0 / .05), rgb(255 255 255 / .07)) !important;
+  --fm-press: light-dark(rgb(0 0 0 / .1), rgb(255 255 255 / .12)) !important;
+  --fm-soft: light-dark(rgb(0 122 255 / .14), rgb(10 132 255 / .24)) !important;
+  --fm-radius: 12px !important;
+  --fm-font: "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif !important;
+  --fm-ring: color-mix(in srgb, var(--fm-accent) 40%, transparent) !important;
+  --fm-ring-focus: color-mix(in srgb, var(--fm-accent) 65%, transparent) !important;
+  --fm-ring-glow: color-mix(in srgb, var(--fm-accent) 10%, transparent) !important;
+  --panel-background-color: var(--fm-menu) !important;
+  --arrowpanel-background: var(--fm-menu) !important;
+  --panel-border-radius: 12px !important;
+  --arrowpanel-border-radius: 12px !important;
+  --menuitem-border-radius: 6px !important;
+  --arrowpanel-menuitem-border-radius: 6px !important;
+  --urlbarview-border-radius: 12px !important;
+  --toolbarbutton-border-radius: 7px !important;
+  --tab-border-radius: 8px !important;
+  --urlbarview-background-color-selected: var(--fm-soft) !important;
+}
+:root:not([inDOMFullscreen], [inFullscreen]) #tabbrowser-tabpanels .browserContainer { border-radius: var(--fm-radius) !important; }
+menupopup::part(content), panel::part(content) {
+  border-radius: 12px !important; background-color: var(--fm-menu) !important; background-image: none !important;
+}
+menupopup > :is(menuitem, menu), .subviewbutton, #appMenu-mainView .subviewbutton { border-radius: 6px !important; }
+.tabbrowser-tab > .tab-stack > .tab-background { border-radius: 8px !important; }
+#urlbar-background, .urlbar-background { border-radius: 10px !important; }
+#urlbar[open] > :is(#urlbar-background, .urlbar-background) { border-radius: 12px !important; }
+toolbar .toolbarbutton-1 > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack, .toolbarbutton-text),
+#PlacesToolbarItems > .bookmark-item, .urlbarView-row-inner, .tab-close-button { border-radius: 7px !important; }
+.urlbarView-favicon { border-radius: 7px !important; }
+#appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon {
+  border-radius: 7px !important; background: var(--fm-tile-color) !important;
+}
+moz-toggle { --toggle-background-color-pressed: var(--fm-accent) !important; }
+.fm-nowbar, .fm-toast { border-radius: 12px !important; }
+#appMenu-mainView { --fm-tile-color: #8E8E93; }
+#appMenu-new-tab-button2 { --fm-tile-color: #0A84FF; }
+#appMenu-history-button { --fm-tile-color: #FF9F0A; }
+#appMenu-bookmarks-button { --fm-tile-color: #FFD60A; }
+#appMenu-downloads-button { --fm-tile-color: #30D158; }
+#appMenu-passwords-button { --fm-tile-color: #8E8E93; }
+#appMenu-extensions-themes-button, #appMenu-unified-extensions-button { --fm-tile-color: #BF5AF2; }
+#appMenu-settings-button { --fm-tile-color: #8E8E93; }
+#appMenu-quit-button2 { --fm-tile-color: #FF453A; }
+#appMenu-new-private-window-button2 { --fm-tile-color: #5E5CE6; }
+#appMenu-translate-button { --fm-tile-color: #64D2FF; }
+
+
+/* кнопки окна — «светофор» macOS */
+.titlebar-buttonbox .titlebar-button {
+  list-style-image: none !important; padding: 0 7px !important; background: transparent !important;
+}
+.titlebar-buttonbox .titlebar-button > .toolbarbutton-icon {
+  width: 13px !important; height: 13px !important; border-radius: 50% !important;
+  box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .25) !important;
+}
+.titlebar-close > .toolbarbutton-icon { background: #ff5f57 !important; }
+.titlebar-min > .toolbarbutton-icon { background: #febc2e !important; }
+:is(.titlebar-max, .titlebar-restore) > .toolbarbutton-icon { background: #28c840 !important; }
+:root:not([tabsintitlebar]) .titlebar-buttonbox .titlebar-button:not(:hover) > .toolbarbutton-icon { filter: saturate(.9); }
+.titlebar-buttonbox .titlebar-button:hover > .toolbarbutton-icon { filter: brightness(.9); }
+/* меню как в macOS: выделение — сплошной синий, белый текст */
+menupopup > :is(menuitem, menu):is([_moz-menuactive], :hover):not([disabled]) {
+  background-color: var(--fm-accent) !important; color: #fff !important;
+}
+menupopup > :is(menuitem, menu) { min-height: 26px !important; padding-block: 3px !important; }
+.tabbrowser-tab[selected] > .tab-stack > .tab-background {
+  background: var(--fm-field) !important;
+  box-shadow: 0 1px 2px light-dark(rgb(0 0 0 / .12), rgb(0 0 0 / .5)), 0 0 0 .5px var(--fm-line) !important;
+}
+.tabbrowser-tab[selected] .tab-label { color: var(--fm-ink) !important; }
+#urlbar-background, .urlbar-background { background-color: var(--fm-field) !important; }
+#urlbar:not([focused], [open]) #urlbar-input { text-align: center !important; }
+#PlacesToolbarItems > .bookmark-item { background: transparent !important; box-shadow: none !important; }
+#PlacesToolbarItems > .bookmark-item:hover { background: var(--fm-hover) !important; }
+

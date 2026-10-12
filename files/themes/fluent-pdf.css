@@ -1,0 +1,22 @@
+
+/* ---------------- Тема: Windows 11 ---------------- */
+:root:has(#outerContainer #viewerContainer) {
+  & {
+    --x-accent: light-dark(var(--fm-user-accent, AccentColor), color-mix(in srgb, var(--fm-user-accent, AccentColor) 70%, white)) !important;
+    --x-on-accent: light-dark(#ffffff, #000000) !important;
+    --x-ground: light-dark(#f3f3f3, #202020) !important;
+    --x-rail: light-dark(#f3f3f3, #202020) !important;
+    --x-bar: light-dark(#fbfbfb, #2b2b2b) !important;
+    --x-well: light-dark(#ffffff, #323232) !important;
+    --x-field: light-dark(#ffffff, #2d2d2d) !important;
+    --x-line: light-dark(rgb(0 0 0 / .08), rgb(255 255 255 / .08)) !important;
+    --x-ink: light-dark(#1a1a1a, #ffffff) !important;
+    --x-muted: light-dark(#5f5f5f, #c5c5c5) !important;
+    --x-radius: 4px !important;
+  }
+  & #toolbarViewerLeft,
+  & #toolbarViewerMiddle,
+  & #editorModeButtons,
+  & #toolbarViewerRight > .toolbarHorizontalGroup:not(#editorModeButtons) { border-radius: 4px !important; }
+  & .toolbarButton:not(.labeled) { border-radius: 4px !important; }
+}

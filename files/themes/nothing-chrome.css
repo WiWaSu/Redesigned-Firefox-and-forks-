@@ -1,0 +1,71 @@
+
+/* ---------------- Тема: Nothing ---------------- */
+:root, menupopup, panel, tooltip, #urlbar, .urlbarView {
+  --fm-accent: var(--fm-user-accent, #D71921) !important;
+  --fm-on-accent: #ffffff !important;
+  --fm-frame: light-dark(#f2f2f2, #000000) !important;
+  --fm-bar: light-dark(#ffffff, #111111) !important;
+  --fm-field: light-dark(#ffffff, #000000) !important;
+  --fm-menu: light-dark(#ffffff, #0d0d0d) !important;
+  --fm-ink: light-dark(#000000, #ffffff) !important;
+  --fm-muted: light-dark(#666666, #8a8a8a) !important;
+  --fm-line: light-dark(rgb(0 0 0 / .25), rgb(255 255 255 / .22)) !important;
+  --fm-hover: light-dark(rgb(0 0 0 / .06), rgb(255 255 255 / .08)) !important;
+  --fm-press: light-dark(rgb(0 0 0 / .12), rgb(255 255 255 / .14)) !important;
+  --fm-soft: light-dark(rgb(0 0 0 / .08), rgb(255 255 255 / .1)) !important;
+  --fm-radius: 20px !important;
+  --fm-font: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif !important;
+  --fm-ring: color-mix(in srgb, var(--fm-accent) 40%, transparent) !important;
+  --fm-ring-focus: color-mix(in srgb, var(--fm-accent) 65%, transparent) !important;
+  --fm-ring-glow: color-mix(in srgb, var(--fm-accent) 10%, transparent) !important;
+  --panel-background-color: var(--fm-menu) !important;
+  --arrowpanel-background: var(--fm-menu) !important;
+  --panel-border-radius: 20px !important;
+  --arrowpanel-border-radius: 20px !important;
+  --menuitem-border-radius: 999px !important;
+  --arrowpanel-menuitem-border-radius: 999px !important;
+  --urlbarview-border-radius: 20px !important;
+  --toolbarbutton-border-radius: 999px !important;
+  --tab-border-radius: 999px !important;
+  --urlbarview-background-color-selected: var(--fm-soft) !important;
+}
+:root:not([inDOMFullscreen], [inFullscreen]) #tabbrowser-tabpanels .browserContainer { border-radius: var(--fm-radius) !important; }
+menupopup::part(content), panel::part(content) {
+  border-radius: 20px !important; background-color: var(--fm-menu) !important; background-image: none !important;
+}
+menupopup > :is(menuitem, menu), .subviewbutton, #appMenu-mainView .subviewbutton { border-radius: 999px !important; }
+.tabbrowser-tab > .tab-stack > .tab-background { border-radius: 999px !important; }
+#urlbar-background, .urlbar-background { border-radius: 999px !important; }
+#urlbar[open] > :is(#urlbar-background, .urlbar-background) { border-radius: 20px !important; }
+toolbar .toolbarbutton-1 > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack, .toolbarbutton-text),
+#PlacesToolbarItems > .bookmark-item, .urlbarView-row-inner, .tab-close-button { border-radius: 999px !important; }
+.urlbarView-favicon { border-radius: 999px !important; }
+#appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon {
+  border-radius: 50% !important; background: transparent !important;
+}
+moz-toggle { --toggle-background-color-pressed: var(--fm-accent) !important; }
+.fm-nowbar, .fm-toast { border-radius: 999px !important; }
+
+
+#appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon { box-shadow: none !important; }
+@media (prefers-color-scheme: light) {
+  #appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon { filter: invert(1) !important; }
+}
+
+/* Nothing: монохром, выбранное — «инверсия» (белая таблетка с чёрным текстом) */
+.tabbrowser-tab[selected] > .tab-stack > .tab-background {
+  background: var(--fm-ink) !important; box-shadow: none !important;
+}
+.tabbrowser-tab[selected] :is(.tab-label, .tab-close-button) { color: var(--fm-frame) !important; fill: var(--fm-frame) !important; }
+#urlbar-background, .urlbar-background {
+  background-color: var(--fm-field) !important;
+  box-shadow: inset 0 0 0 1px var(--fm-line) !important;
+}
+#PlacesToolbarItems > .bookmark-item { background: transparent !important; box-shadow: inset 0 0 0 1px var(--fm-line) !important; }
+#appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon { box-shadow: inset 0 0 0 1px var(--fm-line) !important; }
+.panel-header > h1, #appMenu-popup .panel-header h1 {
+  font-family: "Cascadia Mono", Consolas, ui-monospace, monospace !important;
+  text-transform: uppercase !important; letter-spacing: .12em !important; font-size: 13px !important;
+}
+.fm-toast-dot, .fm-nowbar-eq { background: var(--fm-accent) !important; }
+
