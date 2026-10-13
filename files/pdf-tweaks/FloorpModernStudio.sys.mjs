@@ -9,6 +9,8 @@
  */
 
 export const PREF = "floorp.modern.studio";
+// версия Redesigned Fox — меняется вместе с VERSION (tools/build.sh проверяет)
+export const APP_VERSION = "1.19.0";
 
 /* Описание всех настроек: из него рисуется страница, проверяются значения
    и собирается CSS. null = «как в теме». */
@@ -38,6 +40,7 @@ export const SCHEMA = [
     { key: "tabMinWidth", type: "range", label: "Мин. ширина вкладки", min: 40, max: 260, step: 10, unit: "px" },
     { key: "tabClose", type: "select", label: "Крестик на вкладке", options: [["always", "Всегда"], ["hover", "При наведении"], ["never", "Скрыть"]] },
     { key: "tabWeight", type: "range", label: "Жирность названия", min: 300, max: 800, step: 100 },
+    { key: "tabsHide", type: "select", label: "Скрыть вкладки", hint: "«У края» — вкладки спрятаны и выезжают, когда подводите мышь к краю окна. «Полностью» — их не видно совсем (Alt+Shift+T — показать / спрятать). Не компактный вид, а скрытие целиком", options: [["edge", "У края"], ["always", "Полностью"]] },
   ] },
   { group: "urlbar", title: "Адресная строка", items: [
     { key: "urlHeight", type: "range", label: "Высота", min: 28, max: 52, step: 1, unit: "px" },
@@ -86,6 +89,9 @@ export const SCHEMA = [
     { key: "searchWidth", type: "range", label: "Ширина поиска", min: 30, max: 90, step: 5, unit: "%" },
     { key: "tiles", type: "bool", label: "Ярлыки сайтов" },
     { key: "wallBlur", type: "range", label: "Размытие обоев", min: 0, max: 40, step: 2, unit: "px" },
+  ] },
+  { group: "update", title: "Обновления", items: [
+    { key: "checkUpdates", type: "bool", label: "Проверять обновления", hint: "Раз в сутки смотрит на github.com/WiWaSu/Redesigned-Firefox-and-forks- — есть ли новая версия. Ничего не скачивает сам" },
   ] },
   { group: "hide", title: "Показать / скрыть", items: [
     { key: "showBookmarks", type: "bool", label: "Панель закладок" },
@@ -483,6 +489,25 @@ export function buildCss(cfgRaw) {
     chrome.push(`.tabbrowser-tab .tab-label, .tabbrowser-tab[selected] .tab-label { font-weight: ${c.tabWeight} !important; }`);
   }
 
+  // вкладки спрятаны: боковая панель вкладок становится «шторкой» поверх страницы,
+  // верхний ряд вкладок сворачивается и появляется при наведении на панель
+  if (has("tabsHide")) {
+    const V = '#browser > :has(#tabbrowser-tabs[orient="vertical"])';
+    const edge = c.tabsHide === "edge";
+    chrome.push(`#browser { position: relative !important; }`);
+    chrome.push(`:root:not([customizing]) ${V} {
+      position: absolute !important; inset-block: 0 !important; inset-inline-start: 0 !important; z-index: 30 !important;
+      translate: ${edge ? "calc(-100% + 8px)" : "-100%"} 0; opacity: 0;
+      ${edge ? "" : "visibility: hidden;"}
+      background-color: var(--fm-frame, var(--toolbox-background-color, Canvas)) !important;
+      box-shadow: 10px 0 34px rgb(0 0 0 / .32) !important;
+      transition: translate calc(.38s * var(--fm-k, 1)) var(--fm-spring, ease), opacity .2s ease, visibility 0s .38s !important; }`);
+    chrome.push(`:root:not([customizing]) ${V}:is(:hover, :focus-within, [fm-open]), :root[fm-tabs-peek] ${V} {
+      translate: 0 0; opacity: 1; visibility: visible; transition: translate calc(.38s * var(--fm-k, 1)) var(--fm-spring, ease), opacity .15s ease !important; }`);
+    chrome.push(`:root:not([customizing]) #sidebar-launcher-splitter { display: none !important; }`);
+    chrome.push(`:root:not([customizing]):not([fm-tabs-peek]) #navigator-toolbox:not(:hover, :focus-within) #TabsToolbar:has(#tabbrowser-tabs:not([orient="vertical"])) { visibility: collapse !important; }`);
+  }
+
   // адресная строка
   if (has("urlHeight")) {
     chrome.push(`#urlbar { --urlbar-min-height: ${px(c.urlHeight)} !important; --urlbar-height: ${px(c.urlHeight)} !important; }`);
@@ -597,11 +622,9 @@ function sss() {
 }
 
 export function version() {
-  try {
-    return Services.prefs.getStringPref("floorp.modern.version", "");
-  } catch (e) {
-    return "";
-  }
+  // раньше брали из настройки, которую пишет только установщик, — после обновления файлов
+  // без переустановки там оставалась старая версия (например, 1.13.0)
+  return APP_VERSION;
 }
 
 export function readConfig() {
@@ -662,6 +685,10 @@ export function init() {
     return;
   }
   started = true;
+  // настоящая версия — в настройку (её читают страница Studio и журналы)
+  try {
+    Services.prefs.setStringPref("floorp.modern.version", APP_VERSION);
+  } catch (e) {}
   // 1.13.0–1.13.3: браузер при восстановлении вкладки Studio заполнял все поля
   // значениями по умолчанию (серый #808080, ползунки посередине) — такие настройки сбрасываем
   try {

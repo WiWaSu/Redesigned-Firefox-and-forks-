@@ -24,6 +24,9 @@
   [string]$Wall = "keep",
   # включённые функции через запятую
   [string]$Features = "nowbar,progress,center,clock,wallpaper",
+  # язык установщика: ask — спросить при запуске, ru, en
+  [ValidateSet("ask", "ru", "en")]
+  [string]$Lang = "ask",
   [switch]$Gui,
   [string]$UserAppData = $env:APPDATA,
   # для тестов: принудительные пути к папкам браузеров ("ключ=путь;ключ=путь")
@@ -37,12 +40,108 @@ $ErrorActionPreference = "Stop"
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 
 # версия установщика (меняется вместе с файлом VERSION и CHANGELOG.md)
-$Version = "1.16.0"
+$Version = "1.19.0"
 $Here = $PSScriptRoot
 $Utf8 = New-Object System.Text.UTF8Encoding($false)
 $Ru = $true
 try { $Ru = (Get-UICulture).Name -like "ru*" } catch {}
 function T($ru, $en) { if ($Ru) { $ru } else { $en } }
+if ($Lang -eq "ru") { $Ru = $true } elseif ($Lang -eq "en") { $Ru = $false }
+
+# ---------------------------------------------------------------- проверка обновлений
+# репозиторий релизов; смотрим latest.json, иначе самый новый vX.Y.Z.zip в корне
+$ReleasesRepo = "WiWaSu/Redesigned-Firefox-and-forks-"
+$ReleasesPage = "https://github.com/$ReleasesRepo"
+function Get-LatestRelease {
+  try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch {}
+  foreach ($branch in @("main", "master")) {
+    try {
+      $j = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/$ReleasesRepo/$branch/latest.json" -TimeoutSec 3 -UseBasicParsing
+      if ($j.version -match '^v?(\d+\.\d+\.\d+)$') { return $Matches[1] }
+    } catch {}
+  }
+  try {
+    $list = Invoke-RestMethod -Uri "https://api.github.com/repos/$ReleasesRepo/contents/" -TimeoutSec 3 -UseBasicParsing -Headers @{ "User-Agent" = "RedesignedFox-Setup" }
+    $best = $null
+    foreach ($f in $list) {
+      if ($f.name -match '^v(\d+\.\d+\.\d+)\.zip$') {
+        $v = [version]$Matches[1]
+        if (-not $best -or $v -gt $best) { $best = $v }
+      }
+    }
+    if ($best) { return $best.ToString() }
+  } catch {}
+  return $null
+}
+function Test-Newer($latest) {
+  if (-not $latest) { return $false }
+  try { return ([version]$latest -gt [version]$Version) } catch { return $false }
+}
+
+# выбор языка при запуске: маленькое окно «Русский / English» (или вопрос в консоли)
+function Select-Language([switch]$Console) {
+  if ($Lang -ne "ask") { return }
+  if ($Console) {
+    Write-Host ""
+    Write-Host "  1. Русский" -ForegroundColor Cyan
+    Write-Host "  2. English" -ForegroundColor Cyan
+    $a = Read-Host "Язык / Language [1/2]"
+    if ($a -match '^\s*2') { $script:Ru = $false } elseif ($a -match '^\s*1') { $script:Ru = $true }
+    return
+  }
+  try {
+    Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
+    [xml]$x = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Redesigned Fox" Width="420" Height="250" WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" Topmost="True">
+  <Border CornerRadius="22" Background="#F2141519" BorderBrush="#33FFFFFF" BorderThickness="1" Padding="26">
+    <StackPanel>
+      <TextBlock Text="Redesigned Fox" Foreground="White" FontSize="22" FontWeight="SemiBold" FontFamily="Segoe UI Variable Display, Segoe UI"/>
+      <TextBlock Text="Выберите язык  ·  Choose your language" Foreground="#99FFFFFF" FontSize="13" Margin="0,4,0,22" FontFamily="Segoe UI"/>
+      <UniformGrid Columns="2">
+        <Button x:Name="RuBtn" Height="64" Margin="0,0,6,0" Cursor="Hand">
+          <Button.Template><ControlTemplate TargetType="Button">
+            <Border x:Name="B" CornerRadius="16" Background="#1FFFFFFF" BorderBrush="#33FFFFFF" BorderThickness="1">
+              <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Русский" Foreground="White" FontSize="17" FontWeight="SemiBold" HorizontalAlignment="Center" FontFamily="Segoe UI"/>
+                <TextBlock Text="RU" Foreground="#80FFFFFF" FontSize="11" HorizontalAlignment="Center" FontFamily="Segoe UI"/>
+              </StackPanel>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="B" Property="Background" Value="#8E6BFF"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate></Button.Template>
+        </Button>
+        <Button x:Name="EnBtn" Height="64" Margin="6,0,0,0" Cursor="Hand">
+          <Button.Template><ControlTemplate TargetType="Button">
+            <Border x:Name="B" CornerRadius="16" Background="#1FFFFFFF" BorderBrush="#33FFFFFF" BorderThickness="1">
+              <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="English" Foreground="White" FontSize="17" FontWeight="SemiBold" HorizontalAlignment="Center" FontFamily="Segoe UI"/>
+                <TextBlock Text="EN" Foreground="#80FFFFFF" FontSize="11" HorizontalAlignment="Center" FontFamily="Segoe UI"/>
+              </StackPanel>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="B" Property="Background" Value="#8E6BFF"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate></Button.Template>
+        </Button>
+      </UniformGrid>
+    </StackPanel>
+  </Border>
+</Window>
+"@
+    $w = [Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $x))
+    $script:langPicked = $null
+    $w.FindName("RuBtn").Add_Click({ $script:langPicked = "ru"; $w.Close() })
+    $w.FindName("EnBtn").Add_Click({ $script:langPicked = "en"; $w.Close() })
+    $w.Add_MouseLeftButtonDown({ try { $w.DragMove() } catch {} })
+    $w.Add_KeyDown({ param($s, $e) if ($e.Key -eq "Escape") { $w.Close() } })
+    [void]$w.ShowDialog()
+    if ($script:langPicked -eq $null) { exit 0 }   # окно закрыли — выходим
+    $script:Ru = ($script:langPicked -eq "ru")
+  } catch {}
+}
 
 $script:GuiLog = $null
 $script:GuiWindow = $null
@@ -1052,6 +1151,15 @@ public static extern int DwmSetWindowAttribute(System.IntPtr hwnd, int attr, ref
 
   # ---------- тексты ----------
   (& $get "VersionLabel").Text = "v$Version"
+  # есть версия новее — показываем рядом с номером, по нажатию открывается страница релизов
+  $latest = Get-LatestRelease
+  if (Test-Newer $latest) {
+    $vl = & $get "VersionLabel"
+    $vl.Text = "v$Version  ·  " + (T "есть v$latest — скачать" "v$latest available — download")
+    $vl.Foreground = [Windows.Media.Brushes]::Gold
+    $vl.Cursor = [Windows.Input.Cursors]::Hand
+    $vl.Add_MouseLeftButtonUp({ Start-Process $ReleasesPage })
+  }
   $window.Title = "Redesigned Fox $Version"
   (& $get "Subtitle").Text = T "Новый вид для Floorp, Firefox и их форков" "A fresh look for Floorp, Firefox and forks"
   (& $get "Step1").Content = T "1  Тема" "1  Theme"
@@ -1402,7 +1510,7 @@ if (-not $SkipAdmin -and -not (Test-Admin)) {
   $argList = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "`"$PSCommandPath`"",
                "-Action", $Action, "-Target", $Target, "-Theme", $Theme, "-Pdf", $Pdf,
                "-Accent", $Accent, "-Mode", $Mode, "-Corners", $Corners, "-Motion", $Motion, "-Wall", "`"$Wall`"", "-Features", "`"$Features`"",
-               "-UserAppData", "`"$UserAppData`"")
+               "-UserAppData", "`"$UserAppData`"", "-Lang", $Lang)
   if ($Gui) { $argList = @("-STA", "-WindowStyle", "Hidden") + $argList + @("-Gui") }
   else { Write-Host (T "Нужны права администратора (чтобы положить загрузчик в папку браузера). Сейчас Windows спросит разрешение..." "Administrator rights are needed. Windows will ask now...") -ForegroundColor Yellow }
   try {
@@ -1415,6 +1523,7 @@ if (-not $SkipAdmin -and -not (Test-Admin)) {
 }
 
 if ($Gui) {
+  Select-Language
   try {
     Show-Gui
   } catch {
@@ -1428,8 +1537,11 @@ if ($Gui) {
 }
 
 # ---------------- консольный режим ----------------
+Select-Language -Console
 Say ""
 Say "Redesigned Fox $Version" Cyan
+$latest = Get-LatestRelease
+if (Test-Newer $latest) { Say ((T "Есть новая версия v${latest}: " "New version v${latest} available: ") + $ReleasesPage) Yellow }
 if ($found.Count -eq 0) {
   Say (T "Не нашёл ни одного браузера на движке Firefox (Floorp, Firefox, LibreWolf, Waterfox, Zen, Mercury)." "No Firefox-based browser found.") Red
   if (-not $SkipAdmin) { Read-Host (T "Нажмите Enter" "Press Enter") | Out-Null }

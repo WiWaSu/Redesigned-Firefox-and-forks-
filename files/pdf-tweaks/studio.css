@@ -206,3 +206,4 @@ h2 { font: 700 18px "Segoe UI Variable Display", "Segoe UI", sans-serif; margin:
 .theme-pv i:nth-child(2) { inset: 26px 8px 8px 8px; border-radius: 8px; background: var(--b); opacity: .7; }
 .theme-pv i:nth-child(3) { left: 14px; bottom: 14px; width: 30px; height: 8px; border-radius: 4px; background: var(--c); }
 .theme-name { font-weight: 600; font-size: 13px; padding-inline: 2px; }
+.upd { color: var(--acc); font-weight: 600; text-decoration: none; } .upd:hover { text-decoration: underline; }

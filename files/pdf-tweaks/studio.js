@@ -336,6 +336,14 @@ if (direct) {
   markTheme();
   try {
     $("#ver").textContent = "· версия " + direct.version();
+    const up = ChromeUtils.importESModule("resource://pdftweaks/FloorpModernUpdate.sys.mjs");
+    const k = up.known();
+    if (k) {
+      const a = mk("a", "upd", ` · доступна ${k.version}`);
+      a.href = k.notes;
+      a.target = "_blank";
+      $("#ver").append(a);
+    }
   } catch {}
   document.documentElement.toggleAttribute("connected", true);
   refreshAll();

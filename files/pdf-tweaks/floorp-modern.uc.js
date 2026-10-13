@@ -11,6 +11,7 @@
  *  8. Alt+Shift+D — закрыть повторяющиеся вкладки.
  *  9. Alt+Shift+Z — режим фокуса (прячет закладки и боковые панели).
  * 10. Плашка звонка: звонок в другой вкладке, микрофон / камера (Alt+Shift+M).
+ * 11. Alt+Shift+T — спрятать / показать вкладки целиком.
  */
 (function () {
   "use strict";
@@ -368,6 +369,78 @@
       log("темы: ОШИБКА", e);
     }
 
+    /* ---------- скрыть вкладки целиком (Alt+Shift+T) ---------- */
+    const LAST_HIDE = "floorp.modern.tabs.lastHide";
+    win.FloorpModernToggleTabs = () => {
+      const cfg = studio.readConfig();
+      if (cfg.tabsHide) {
+        try {
+          Services.prefs.setStringPref(LAST_HIDE, cfg.tabsHide);
+        } catch (e) {}
+        delete cfg.tabsHide;
+        toast("Вкладки снова видны", "info");
+      } else {
+        let mode = "edge";
+        try {
+          mode = Services.prefs.getStringPref(LAST_HIDE, "edge") === "always" ? "always" : "edge";
+        } catch (e) {}
+        cfg.tabsHide = mode;
+        toast(mode === "edge" ? "Вкладки спрятаны — подведите мышь к краю окна" : "Вкладки спрятаны (Alt+Shift+T — вернуть)", "info");
+      }
+      studio.save(cfg);
+      return !!cfg.tabsHide;
+    };
+    win.addEventListener("keydown", e => {
+      if (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey && e.code === "KeyT") {
+        e.preventDefault();
+        e.stopPropagation();
+        win.FloorpModernToggleTabs();
+      }
+    }, true);
+    // при переключении вкладок с клавиатуры, пока они спрятаны, — коротко показываем список
+    let peekTimer = 0;
+    const peek = () => {
+      if (!studio.readConfig().tabsHide) {
+        return;
+      }
+      doc.documentElement.setAttribute("fm-tabs-peek", "true");
+      win.clearTimeout(peekTimer);
+      peekTimer = win.setTimeout(() => doc.documentElement.removeAttribute("fm-tabs-peek"), 1400);
+    };
+    win.addEventListener("keydown", e => {
+      if (e.ctrlKey && (e.key === "Tab" || e.key === "PageDown" || e.key === "PageUp")) {
+        win.setTimeout(peek, 0);
+      }
+    }, true);
+
+    /* ---------- проверка обновлений (раз в сутки) ---------- */
+    let update = null;
+    try {
+      update = ChromeUtils.importESModule("resource://pdftweaks/FloorpModernUpdate.sys.mjs");
+    } catch (e) {
+      log("обновления: модуль", e);
+    }
+    // красная точка на кнопке «Дизайн», пока есть непросмотренное обновление
+    function markUpdate() {
+      const k = update?.known();
+      const on = !!k && !update.skipped(k.version);
+      doc.getElementById("fm-studio-button")?.toggleAttribute("fm-update", on);
+    }
+    if (update) {
+      win.setTimeout(() => {
+        update.check(win).then(r => {
+          if (r.error) {
+            log("обновления: " + r.error);
+          }
+          markUpdate();
+          if (r.newer && !r.cached && !update.skipped(r.latest.version)) {
+            toast(`Доступна Redesigned Fox ${r.latest.version} — нажмите кнопку «Дизайн»`, "info");
+            log("обновления: доступна " + r.latest.version + " (" + r.latest.source + ")");
+          }
+        });
+      }, 8000);
+    }
+
     /* ---------- быстрая панель по кнопке «Дизайн» ---------- */
     const QP_CSS = `
       #fm-quick-panel { --arrowpanel-padding: 0; }
@@ -409,6 +482,19 @@
       #fm-quick-panel .fm-qp-more { all: unset; text-align: center; padding: 10px; border-radius: 12px; cursor: pointer; font-weight: 700;
         background: var(--fm-accent, AccentColor); color: var(--fm-on-accent, #fff); transition: scale calc(.3s * var(--fm-k, 1)) var(--fm-spring, ease); }
       #fm-quick-panel .fm-qp-more:hover { scale: 1.02; }
+      #fm-quick-panel .fm-qp-upd { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 14px;
+        background: var(--fm-soft, rgb(128 128 128 / .15)); border: 1px solid var(--fm-accent, AccentColor); }
+      #fm-quick-panel .fm-qp-upd[hidden] { display: none; }
+      #fm-quick-panel .fm-qp-upd b { font-size: 13.5px; }
+      #fm-quick-panel .fm-qp-upd-btns { display: flex; gap: 6px; }
+      #fm-quick-panel .fm-qp-upd-btns > button { all: unset; flex: 1; text-align: center; padding: 7px 0; border-radius: 10px; cursor: pointer; font-weight: 600;
+        background: var(--fm-hover, rgb(128 128 128 / .15)); }
+      #fm-quick-panel .fm-qp-upd-btns > button:first-child { background: var(--fm-accent, AccentColor); color: var(--fm-on-accent, #fff); }
+      #fm-quick-panel .fm-qp-foot { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; opacity: .65; padding: 0 2px; }
+      #fm-quick-panel .fm-qp-foot > button { all: unset; cursor: pointer; text-decoration: underline; }
+      #fm-quick-panel .fm-qp-foot > button:hover { opacity: 1; color: var(--fm-accent, AccentColor); }
+      #fm-studio-button[fm-update] .toolbarbutton-icon {
+        background-image: radial-gradient(circle at 82% 18%, #ff4d5e 3.2px, transparent 3.8px) !important; }
       #fm-quick-panel .fm-qp-more:active { scale: .97; }
     `;
     try {
@@ -434,6 +520,38 @@
       title.textContent = "Redesigned Fox";
       head.append(title);
       box.append(head);
+      // карточка «есть обновление»
+      const upd = el("div", "fm-qp-upd");
+      const updText = el("b");
+      const updBtns = el("div", "fm-qp-upd-btns");
+      const updGet = el("button");
+      updGet.textContent = "Скачать";
+      const updNotes = el("button");
+      updNotes.textContent = "Что нового";
+      const updLater = el("button");
+      updLater.textContent = "Позже";
+      updBtns.append(updGet, updNotes, updLater);
+      upd.append(updText, updBtns);
+      upd.hidden = true;
+      box.append(upd);
+      const openLink = url => {
+        panel.hidePopup();
+        try {
+          win.openWebLinkIn(url, "tab");
+        } catch (e) {
+          win.gBrowser.selectedTab = win.gBrowser.addTrustedTab(url, { triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal() });
+        }
+      };
+      updGet.addEventListener("click", () => update && update.known() && openLink(update.known().zip));
+      updNotes.addEventListener("click", () => update && update.known() && openLink(update.known().notes));
+      updLater.addEventListener("click", () => {
+        const k = update?.known();
+        if (k) {
+          update.skip(k.version);
+        }
+        markUpdate();
+        upd.hidden = true;
+      });
 
       const cap = text => {
         const c = el("div", "fm-qp-cap");
@@ -482,9 +600,27 @@
         }
         studio.save(cfg);
         sqSw.toggleAttribute("on", !!cfg.square);
+        thSw.toggleAttribute("on", !!cfg.tabsHide);
+        const k = update?.known();
+        upd.hidden = !k || update.skipped(k.version);
+        if (k) {
+          updText.textContent = `Доступна версия ${k.version} (у вас ${update.APP_VERSION})`;
+        }
+        verText.textContent = "Redesigned Fox " + (update ? update.APP_VERSION : "");
         toast(cfg.square ? "Скругления убраны" : "Скругления как в теме", "info");
       });
       box.append(sq);
+      // скрыть вкладки целиком
+      const th = el("div", "fm-qp-row");
+      const thLabel = el("span");
+      thLabel.textContent = "Скрыть вкладки";
+      const thSw = el("span", "fm-qp-sw");
+      th.append(thLabel, thSw);
+      th.addEventListener("click", () => {
+        const on = win.FloorpModernToggleTabs?.();
+        thSw.toggleAttribute("on", !!on);
+      });
+      box.append(th);
       // светлая / тёмная
       cap("Оформление");
       const seg = el("div", "fm-qp-seg");
@@ -537,12 +673,39 @@
         openOnce(win);
       });
       box.append(more);
+      // версия и ручная проверка обновлений
+      const foot = el("div", "fm-qp-foot");
+      const verText = el("span");
+      const checkBtn = el("button");
+      checkBtn.textContent = "Проверить обновления";
+      foot.append(verText, checkBtn);
+      box.append(foot);
+      checkBtn.addEventListener("click", () => {
+        if (!update) {
+          return;
+        }
+        checkBtn.textContent = "Проверяю…";
+        update.check(win, { force: true }).then(r => {
+          checkBtn.textContent = "Проверить обновления";
+          if (r.error) {
+            toast("Не получилось проверить обновления: " + r.error, "warn");
+          } else if (r.newer) {
+            Services.prefs.setStringPref("floorp.modern.update.skip", "");
+            toast("Доступна версия " + r.latest.version, "info");
+          } else {
+            toast("У вас последняя версия — " + update.APP_VERSION, "info");
+          }
+          markUpdate();
+          fill();
+        });
+      });
 
       fill = () => {
         const cur = themes ? themes.current() : "";
         for (const x of grid.children) x.toggleAttribute("on", x.dataset.id === cur);
         const cfg = studio.readConfig();
         sqSw.toggleAttribute("on", !!cfg.square);
+        thSw.toggleAttribute("on", !!cfg.tabsHide);
         let mode = 2;
         try {
           mode = Services.prefs.getIntPref("browser.theme.toolbar-theme", 2);

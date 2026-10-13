@@ -7,7 +7,7 @@
 **A complete redesign for Floorp, Firefox and Firefox forks on Windows.**
 12 themes · live design studio · new-tab wallpapers · iOS-style animations · reworked PDF viewer
 
-![Version](https://img.shields.io/badge/version-1.16.0-8e6bff)
+![Version](https://img.shields.io/badge/version-1.19.0-8e6bff)
 ![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)
 ![Floorp](https://img.shields.io/badge/Floorp-12-6b4dff)
 ![Firefox](https://img.shields.io/badge/Firefox-156%2B-ff7139)
@@ -53,6 +53,7 @@ Open with **All design settings…** in the quick panel, **☰ → Design**, or 
 
 - **Colors** — accent, window background, fields, menus, text; menu transparency and blur
 - **Shape** — **no rounded corners at all** (one switch), page corner radius, gap and shadow, menu radius, button shape, density
+- **Hide tabs completely** — not the compact strip: tabs slide out from the window edge on hover, or stay fully hidden (`Alt+Shift+T` toggles)
 - **Tabs** — 6 shapes (pill, rounded, square, underline, card, Chrome-like), 6 selected-tab styles (incl. none), height, width, close button, font weight
 - **Address bar** — height, radius, alignment, border style
 - **Right-click menus** — 7 styles: One UI, iOS glass, Windows 11, macOS, Touch, Nothing, Neon
@@ -69,6 +70,9 @@ Open with **All design settings…** in the quick panel, **☰ → Design**, or 
 A call in another tab (Telegram, Discord, WhatsApp, Meet…) shows a small island at the top: site, call timer, mute mic, turn camera off, jump to the call. It shrinks to a timer pill after a few seconds. `Alt+Shift+M` mutes the mic from any tab.
 
 ![Call bar](docs/call-bar.jpg)
+
+### 🔔 Update check
+Once a day the browser checks the [releases repo](https://github.com/WiWaSu/Redesigned-Firefox-and-forks-). A new version shows a notification and a red dot on the Design button; the quick panel has **Download**, **What's new** and **Later**. Nothing is downloaded automatically. Turn it off in Studio → Updates.
 
 ### 🖼 New-tab wallpapers
 Button at the bottom left of the new tab: 10 built-in wallpapers, **your own picture**, dimming slider. Applies to every open new tab at once. Can also be chosen in the installer.
@@ -196,6 +200,7 @@ Unofficial community mod, not affiliated with or endorsed by Mozilla or Ablaze (
 
 - **Цвета** — акцент, фон окна, поля, меню, текст; прозрачность и размытие меню
 - **Форма** — **без скруглений вообще** (один переключатель), скругление, отступ и тень страницы, скругление меню, форма кнопок, плотность
+- **Скрыть вкладки целиком** — не компактный вид: выезжают от края окна при наведении или не видны совсем (`Alt+Shift+T`)
 - **Вкладки** — 6 форм (таблетки, скруглённые, прямые, подчёркивание, карточки, как в Chrome), 6 стилей выбранной вкладки (в том числе без подсветки), высота, ширина, крестик, жирность
 - **Адресная строка** — высота, скругление, выравнивание, рамка
 - **Меню правой кнопки** — 7 стилей: One UI, стекло iOS, Windows 11, macOS, сенсорное, Nothing, неон
@@ -208,6 +213,9 @@ Unofficial community mod, not affiliated with or endorsed by Mozilla or Ablaze (
 
 ### 📞 Плашка звонка
 Звонок в другой вкладке (Telegram, Discord, WhatsApp, Meet…) — сверху появляется «островок»: сайт, время звонка, выключить микрофон или камеру, перейти к звонку. Через пару секунд сворачивается в таблетку с таймером. `Alt+Shift+M` — микрофон из любой вкладки.
+
+### 🔔 Проверка обновлений
+Раз в сутки браузер смотрит в [репозиторий релизов](https://github.com/WiWaSu/Redesigned-Firefox-and-forks-). Есть новая версия — уведомление и красная точка на кнопке «Дизайн», в быстрой панели «Скачать», «Что нового», «Позже». Сам ничего не скачивает. Выключить — Studio → «Обновления».
 
 ### 🖼 Обои новой вкладки
 Кнопка слева внизу: 10 готовых обоев, **своя картинка**, затемнение. Меняются сразу во всех вкладках. Можно выбрать и в установщике.
