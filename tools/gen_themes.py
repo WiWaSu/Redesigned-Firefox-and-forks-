@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Redesigned Fox — дополнительные темы: Material You, Windows 11, macOS, Nothing,
-Night Drive, Aero, Retro 98, Terminal, Paper, Cyberpunk.
+Night Drive, Aero, Retro 98, Terminal, Paper, Cyberpunk и палитры 1.20
+(Arctic, Sakura, Mint, Latte, Midnight, Fjord, Ember, Forest, Ocean, Rosé, Synthwave, High Contrast).
 
 Каждая тема — надстройка поверх базового оформления (One UI), как и тема iOS:
 установщик вставляет её перед END-маркерами базовых блоков. Для каждой темы
@@ -703,6 +704,96 @@ menupopup > :is(menuitem, menu):is([_moz-menuactive]):not([disabled]) { backgrou
 """,
     pdf_bar="#15111f", pdf_well="#1a1526",
 )
+
+
+# ================================================================== палитры (1.20)
+# Темы «на вкус каждого»: одна общая форма, свои цвета, обои, шрифт и скругления.
+def palette(name, scheme, accent, on_accent, frame, bar, field, menu, ink, muted, wall, clock,
+            radius="18px", r_item="10px", r_tab="10px", r_btn="999px", font=None, glass=False, clock_weight=300):
+    dark = scheme == "dark"
+    line = "rgb(255 255 255 / .09)" if dark else "rgb(0 0 0 / .1)"
+    hover = "rgb(255 255 255 / .07)" if dark else "rgb(0 0 0 / .05)"
+    press = "rgb(255 255 255 / .12)" if dark else "rgb(0 0 0 / .09)"
+    acc = f"var(--fm-user-accent, {accent})"
+    font = font or '"Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif'
+    glass_css = ""
+    if glass:
+        glass_css = """
+menupopup::part(content), panel::part(content) { backdrop-filter: blur(26px) saturate(1.6) !important; }
+#urlbar-background, .urlbar-background { backdrop-filter: blur(18px) !important; }"""
+    srch_bg = "rgb(255 255 255 / .08)" if dark else "rgb(255 255 255 / .72)"
+    srch_line = "rgb(255 255 255 / .14)" if dark else "rgb(0 0 0 / .1)"
+    return dict(
+        name=name, accent=acc, on_accent=on_accent,
+        frame=frame, bar=bar, field=field, menu=menu, ink=ink, muted=muted,
+        line=line, hover=hover, press=press,
+        soft=f"color-mix(in srgb, {acc} {'20' if dark else '16'}%, transparent)",
+        radius=radius, r_menu=radius, r_item=r_item, r_tab=r_tab, r_url=r_btn if r_btn != "999px" else "14px", r_btn=r_btn,
+        font=font, tile="var(--fm-accent)", tile_radius="50%", tile_mono=False, toggle="var(--fm-accent)",
+        chrome_extra=f"""
+:root {{ color-scheme: {scheme} !important; }}
+#navigator-toolbox, #nav-bar, #TabsToolbar, #sidebar-main {{ color: var(--fm-ink) !important; }}
+.tabbrowser-tab[selected] > .tab-stack > .tab-background {{
+  background: var(--fm-soft) !important; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fm-accent) 30%, transparent) !important;
+}}
+.tabbrowser-tab[selected] .tab-label {{ color: var(--fm-ink) !important; }}{glass_css}
+""",
+        newtab=f"""
+  html {{ background: {frame} !important; }}
+  #root::before {{ animation: none !important; inset: 0 !important; background: {wall} !important; }}
+  #root::after {{ display: none !important; }}
+  .absolute.top-4.right-4 .tabular-nums {{
+    font-family: {font} !important; font-weight: {clock_weight} !important;
+    font-size: clamp(100px, 12vw, 180px) !important; color: {clock} !important; text-shadow: none !important;
+  }}
+  .absolute.top-4.right-4 .flex-col.text-right > div {{ color: {muted} !important; }}
+  .group.cursor-pointer:has(input[readonly]) {{
+    background: {srch_bg} !important; border: 1px solid {srch_line} !important;
+    backdrop-filter: blur(18px) !important; box-shadow: 0 16px 40px rgb(0 0 0 / {'.35' if dark else '.08'}) !important;
+  }}
+  .group.cursor-pointer:has(input[readonly]) :is(input, svg) {{ color: {ink} !important; }}
+  .inline-block.backdrop-blur-sm.p-3 {{ background: {srch_bg} !important; border-color: {srch_line} !important; }}
+  .inline-block.backdrop-blur-sm.p-3 * {{ color: {ink} !important; }}
+""",
+        pdf_bar=bar, pdf_well=field,
+    )
+
+# светлые
+THEMES["arctic"] = palette("Arctic", "light", "#2F7DF6", "#ffffff", "#eef3f9", "#ffffff", "#ffffff", "rgb(255 255 255 / .96)",
+    "#14202e", "#5b6b80", "radial-gradient(80% 70% at 20% 10%, #dbe9ff, transparent 70%), radial-gradient(70% 60% at 90% 90%, #e3f6ff, transparent 70%), #f4f8fc", "#14202e")
+THEMES["sakura"] = palette("Sakura", "light", "#E0567F", "#ffffff", "#fbf0f3", "#fffafb", "#ffffff", "rgb(255 250 251 / .96)",
+    "#3a1d27", "#8a6672", "radial-gradient(60% 60% at 15% 20%, #ffd3e0, transparent 70%), radial-gradient(60% 60% at 85% 80%, #ffe6ee, transparent 70%), #fdf3f6", "#c23a64", radius="22px", r_item="12px", r_tab="14px")
+THEMES["mint"] = palette("Mint", "light", "#16A37A", "#ffffff", "#eef7f3", "#fbfffd", "#ffffff", "rgb(251 255 253 / .96)",
+    "#12302a", "#5c7a71", "radial-gradient(70% 60% at 80% 15%, #c9f1e2, transparent 70%), radial-gradient(60% 60% at 10% 90%, #e2f7ef, transparent 70%), #f3faf7", "#12302a")
+THEMES["latte"] = palette("Latte", "light", "#8B5E3C", "#ffffff", "#f2ebe3", "#fbf7f2", "#fffdfa", "rgb(251 247 242 / .97)",
+    "#33261c", "#7d6a5a", "radial-gradient(80% 70% at 50% 0%, #f0e2d2, transparent 70%), #f6efe7", "#5a3e28", radius="14px", r_item="8px", r_tab="8px", r_btn="10px",
+    font='"Segoe UI Variable Display", "Segoe UI", sans-serif', clock_weight=500)
+# тёмные
+THEMES["midnight"] = palette("Midnight", "dark", "#6C8CFF", "#0b1022", "#0b1020", "#141a2e", "#18203a", "rgb(20 26 46 / .95)",
+    "#e6eaff", "#8f98bf", "radial-gradient(60% 50% at 50% 0%, #1d2a5c, transparent 70%), radial-gradient(40% 40% at 90% 90%, #2a1d5c, transparent 70%), #080c18", "#dfe5ff", glass=True, clock_weight=200)
+THEMES["fjord"] = palette("Fjord", "dark", "#88C0D0", "#1d2430", "#242b37", "#2e3644", "#343d4c", "rgb(46 54 68 / .97)",
+    "#e5e9f0", "#9aa5b8", "linear-gradient(180deg, #3b4555, #242b37)", "#e5e9f0", radius="12px", r_item="6px", r_tab="6px", r_btn="8px", clock_weight=300)
+THEMES["ember"] = palette("Ember", "dark", "#FE8019", "#1d1a17", "#1d1a17", "#282420", "#302b26", "rgb(40 36 32 / .97)",
+    "#ebdbb2", "#a89984", "radial-gradient(50% 40% at 50% 100%, rgb(254 128 25 / .28), transparent 70%), #1a1714", "#fabd2f", radius="10px", r_item="6px", r_tab="6px", r_btn="8px",
+    font='"Cascadia Code", "Segoe UI", sans-serif', clock_weight=400)
+THEMES["forest"] = palette("Forest", "dark", "#7BC47F", "#0c1a0f", "#0f1a13", "#17241b", "#1c2c21", "rgb(23 36 27 / .96)",
+    "#e2efe3", "#8fa894", "radial-gradient(70% 60% at 30% 100%, #1f4a2a, transparent 70%), radial-gradient(50% 50% at 90% 0%, #23402a, transparent 70%), #0b140e", "#cfe8d1", clock_weight=200)
+THEMES["ocean"] = palette("Ocean", "dark", "#22C3E6", "#03141a", "#06161d", "#0d222b", "#112a35", "rgb(13 34 43 / .95)",
+    "#dff6fb", "#83aab5", "radial-gradient(80% 60% at 50% 110%, #0a5a73, transparent 70%), radial-gradient(40% 40% at 10% 10%, #0b3a4f, transparent 70%), #041015", "#bff1fb", glass=True, clock_weight=200)
+THEMES["rose"] = palette("Rosé", "dark", "#EBBCBA", "#1f1d2e", "#191724", "#1f1d2e", "#26233a", "rgb(31 29 46 / .96)",
+    "#e0def4", "#908caa", "radial-gradient(60% 50% at 80% 10%, rgb(235 188 186 / .18), transparent 70%), radial-gradient(60% 50% at 10% 90%, rgb(196 167 231 / .16), transparent 70%), #191724", "#ebbcba",
+    radius="20px", r_item="12px", r_tab="12px", clock_weight=300)
+THEMES["synthwave"] = palette("Synthwave", "dark", "#FF4FD8", "#14041d", "#140a24", "#1f1033", "#26143d", "rgb(31 16 51 / .95)",
+    "#fbeaff", "#b195c9", "linear-gradient(180deg, #14082a 0%, #2b0b45 55%, #ff4fd8 56%, #2b0b45 57%, #120625 100%)", "#ffd36b",
+    radius="16px", r_item="8px", r_tab="8px", glass=True, clock_weight=700, font='Bahnschrift, "Segoe UI", sans-serif')
+THEMES["contrast"] = palette("High Contrast", "dark", "#FFE600", "#000000", "#000000", "#000000", "#0a0a0a", "#000000",
+    "#ffffff", "#e0e0e0", "#000000", "#ffe600", radius="6px", r_item="4px", r_tab="4px", r_btn="6px", clock_weight=800)
+THEMES["contrast"]["line"] = "#ffffff"
+THEMES["contrast"]["chrome_extra"] += """
+.tabbrowser-tab[selected] > .tab-stack > .tab-background { outline: 2px solid var(--fm-accent) !important; outline-offset: -2px !important; }
+:focus-visible { outline: 3px solid var(--fm-accent) !important; }
+menupopup::part(content), panel::part(content) { border: 2px solid #ffffff !important; }
+"""
 
 
 def tok(t):

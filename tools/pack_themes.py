@@ -42,6 +42,18 @@ THEMES = [
     ("terminal", "Terminal", ["#030803", "#081108", "#33ff66", "#b7ffc4"]),
     ("paper", "Paper", ["#f3eee3", "#fbf8f1", "#b4532a", "#2b2620"]),
     ("cyber", "Cyberpunk", ["#0a0612", "#15111f", "#ff00aa", "#f3f0ff"]),
+    ("arctic", "Arctic", ["#eef3f9", "#ffffff", "#2f7df6", "#14202e"]),
+    ("sakura", "Sakura", ["#fbf0f3", "#fffafb", "#e0567f", "#3a1d27"]),
+    ("mint", "Mint", ["#eef7f3", "#fbfffd", "#16a37a", "#12302a"]),
+    ("latte", "Latte", ["#f2ebe3", "#fbf7f2", "#8b5e3c", "#33261c"]),
+    ("midnight", "Midnight", ["#0b1020", "#141a2e", "#6c8cff", "#e6eaff"]),
+    ("fjord", "Fjord", ["#242b37", "#2e3644", "#88c0d0", "#e5e9f0"]),
+    ("ember", "Ember", ["#1d1a17", "#282420", "#fe8019", "#ebdbb2"]),
+    ("forest", "Forest", ["#0f1a13", "#17241b", "#7bc47f", "#e2efe3"]),
+    ("ocean", "Ocean", ["#06161d", "#0d222b", "#22c3e6", "#dff6fb"]),
+    ("rose", "Rosé", ["#191724", "#1f1d2e", "#ebbcba", "#e0def4"]),
+    ("synthwave", "Synthwave", ["#140a24", "#1f1033", "#ff4fd8", "#fbeaff"]),
+    ("contrast", "High Contrast", ["#000000", "#000000", "#ffe600", "#ffffff"]),
 ]
 PARTS = ("chrome", "content", "pdf")
 

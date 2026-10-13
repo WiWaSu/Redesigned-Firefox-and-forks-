@@ -5,9 +5,9 @@
 <sub>formerly Floorp Modern</sub>
 
 **A complete redesign for Floorp, Firefox and Firefox forks on Windows.**
-12 themes · live design studio · new-tab wallpapers · iOS-style animations · reworked PDF viewer
+24 themes · live design studio · new-tab wallpapers · iOS-style animations · reworked PDF viewer
 
-![Version](https://img.shields.io/badge/version-1.19.0-8e6bff)
+![Version](https://img.shields.io/badge/version-1.20.0-8e6bff)
 ![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)
 ![Floorp](https://img.shields.io/badge/Floorp-12-6b4dff)
 ![Firefox](https://img.shields.io/badge/Firefox-156%2B-ff7139)
@@ -15,7 +15,7 @@
 
 [Русская версия ниже](#русский) · [Changelog](CHANGELOG.md) · [Release notes by version](changes/)
 
-![12 themes](docs/hero.jpg)
+![24 themes](docs/hero.jpg)
 
 </div>
 
@@ -25,7 +25,7 @@ Floorp · Firefox · Firefox Developer Edition · Firefox Nightly · LibreWolf �
 
 ## Features
 
-### 🎨 12 themes
+### 🎨 24 themes
 | Theme | Look |
 |---|---|
 | **One UI** | Samsung Galaxy: pure black, pill-shaped tabs and buttons, thin lock-screen clock |
@@ -40,16 +40,24 @@ Floorp · Firefox · Firefox Developer Edition · Firefox Nightly · LibreWolf �
 | **Terminal** | Green phosphor, monospace everything, scanlines, blinking cursor |
 | **Paper** | Warm paper, serif font, flat and calm |
 | **Cyberpunk** | Cut corners, yellow neon, pink and cyan city grid |
+| **Arctic · Sakura · Mint · Latte** | Light palettes: ice blue, soft pink, fresh mint, coffee with milk |
+| **Midnight · Fjord · Ember · Forest · Ocean · Rosé** | Dark palettes: navy glass, nordic grey-blue, warm embers, deep forest, ocean turquoise, muted rose |
+| **Synthwave** | 80s neon sunset, pink and purple |
+| **High Contrast** | Black, white and yellow — maximum readability |
+
+Themes are grouped (dark, light, glass, bright, strict, retro) and picked from compact chips in Studio or color dots in the quick panel.
+
+![Theme picker](docs/studio-themes.jpg)
 
 ### 🎛 Quick panel — switch themes right in the browser
-Click the **palette button** on the toolbar: pick any of the 12 themes, turn **all rounded corners off**, switch light / dark and the accent color. Everything applies instantly in every window, the new tab, settings pages and PDFs — no installer, no restart. The choice is also written to `userChrome.css` / `userContent.css`, so it stays after a restart.
+Click the **palette button** on the toolbar: pick any of the 24 themes, turn **all rounded corners off**, switch light / dark and the accent color. Everything applies instantly in every window, the new tab, settings pages and PDFs — no installer, no restart. The choice is also written to `userChrome.css` / `userContent.css`, so it stays after a restart.
 
 ![Quick panel](docs/quick-panel.jpg)
 
 ### 🛠 Redesigned Fox Studio — tweak everything, live
 Open with **All design settings…** in the quick panel, **☰ → Design**, or `Alt+Shift+S`. Every change applies instantly, on top of any theme:
 
-- **Theme** — the same 12 themes, switched live
+- **Theme** — the same 24 themes, switched live
 
 - **Colors** — accent, window background, fields, menus, text; menu transparency and blur
 - **Shape** — **no rounded corners at all** (one switch), page corner radius, gap and shadow, menu radius, button shape, density
@@ -172,11 +180,11 @@ Unofficial community mod, not affiliated with or endorsed by Mozilla or Ablaze (
 ## Русский
 
 **Полный редизайн Floorp, Firefox и форков Firefox для Windows.** (раньше назывался Floorp Modern)
-12 тем · живая настройка дизайна · обои новой вкладки · анимации как в iOS · новый просмотрщик PDF
+24 темы · живая настройка дизайна · обои новой вкладки · анимации как в iOS · новый просмотрщик PDF
 
 **Поддерживаются:** Floorp, Firefox, Firefox Developer Edition, Firefox Nightly, LibreWolf, Waterfox, Zen Browser, Mercury.
 
-### 🎨 12 тем
+### 🎨 24 темы
 - **One UI** — как Samsung Galaxy: чёрный фон, вкладки и кнопки-«таблетки», тонкие часы.
 - **iOS · Liquid Glass** — как iOS 26: обои под окном, парящая стеклянная панель, стеклянные вкладки, меню и часы.
 - **Material You** — как Android / Pixel: тональные цвета из акцента, часы столбиком.
@@ -189,14 +197,20 @@ Unofficial community mod, not affiliated with or endorsed by Mozilla or Ablaze (
 - **Terminal** — зелёный фосфор, всё моноширинное, строки развёртки, мигающий курсор.
 - **Paper** — тёплая бумага, шрифт с засечками, плоско и спокойно.
 - **Cyberpunk** — срезанные углы, жёлтый неон, розово-голубой город.
+- **Arctic, Sakura, Mint, Latte** — светлые: ледяной голубой, нежно-розовая, мята, кофе с молоком.
+- **Midnight, Fjord, Ember, Forest, Ocean, Rosé** — тёмные: синяя ночь со стеклом, северный серо-голубой, тёплые угли, лес, океан, приглушённая роза.
+- **Synthwave** — неоновый закат 80-х.
+- **High Contrast** — чёрный, белый, жёлтый: максимальная читаемость.
+
+Темы разложены по группам (тёмные, светлые, стекло, яркие, строгие, ретро) и выбираются компактными «таблетками» в Studio или кружками в быстрой панели.
 
 ### 🎛 Быстрая панель — темы прямо в браузере
-Кнопка **с палитрой** на панели: любая из 12 тем, **«Без скруглений»**, светлое / тёмное оформление, цвет акцента. Всё меняется сразу во всех окнах, на новой вкладке, в настройках и в PDF — без установщика и без перезапуска. Выбор записывается и в `userChrome.css` / `userContent.css`, так что после перезапуска всё остаётся.
+Кнопка **с палитрой** на панели: любая из 24 тем, **«Без скруглений»**, светлое / тёмное оформление, цвет акцента. Всё меняется сразу во всех окнах, на новой вкладке, в настройках и в PDF — без установщика и без перезапуска. Выбор записывается и в `userChrome.css` / `userContent.css`, так что после перезапуска всё остаётся.
 
 ### 🛠 Redesigned Fox Studio — настройка всего, сразу
 **«Все настройки дизайна…»** в быстрой панели, **☰ → Дизайн** или `Alt+Shift+S`. Всё меняется мгновенно, поверх любой темы:
 
-- **Тема** — те же 12 тем, меняются сразу
+- **Тема** — те же 24 темы, меняются сразу
 
 - **Цвета** — акцент, фон окна, поля, меню, текст; прозрачность и размытие меню
 - **Форма** — **без скруглений вообще** (один переключатель), скругление, отступ и тень страницы, скругление меню, форма кнопок, плотность
