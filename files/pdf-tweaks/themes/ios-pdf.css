@@ -1,0 +1,52 @@
+/* FM-THEME BEGIN ios pdf */
+/* ---------------- iOS 26 · Liquid Glass ---------------- */
+:root:not([fm-theme]:not([fm-theme="ios"])):has(#outerContainer #viewerContainer) {
+  & {
+    --x-accent: light-dark(var(--fm-user-accent, #007AFF), var(--fm-user-accent, #0A84FF)) !important;
+    --x-on-accent: #ffffff !important;
+    --x-ground: light-dark(#ECEFF6, #07080E) !important;
+    --x-bar: transparent !important;
+    --x-well: light-dark(rgb(255 255 255 / .66), rgb(36 36 44 / .68)) !important;
+    --x-field: light-dark(rgb(255 255 255 / .8), rgb(255 255 255 / .1)) !important;
+    --x-rim: inset 0 1px 0 light-dark(#fff, rgb(255 255 255 / .32)),
+             inset 0 -1px 0 light-dark(rgb(255 255 255 / .5), rgb(255 255 255 / .07)),
+             inset 1px 0 0 light-dark(rgb(255 255 255 / .55), rgb(255 255 255 / .08)),
+             inset -1px 0 0 light-dark(rgb(255 255 255 / .55), rgb(255 255 255 / .08));
+    --x-sheen: linear-gradient(180deg, light-dark(rgb(255 255 255 / .6), rgb(255 255 255 / .12)), transparent 60%);
+  }
+  /* страницы уходят под панель, а панель — стеклянные капсулы поверх них */
+  & #viewerContainer {
+    inset-block-start: 0 !important;
+    background:
+      radial-gradient(60% 50% at 0% 0%, light-dark(rgb(122 170 255 / .35), rgb(10 132 255 / .16)), transparent 70%),
+      radial-gradient(50% 50% at 100% 100%, light-dark(rgb(255 172 200 / .3), rgb(255 55 95 / .1)), transparent 70%),
+      var(--x-ground) !important;
+    background-attachment: local, local, scroll !important;
+  }
+  & .pdfViewer { padding-block-start: 68px !important; }
+  & #loadingBar { border-bottom: 0 !important; background-color: transparent !important; }
+  & #toolbarContainer {
+    position: relative !important;
+    z-index: 30 !important;
+    background: transparent !important;
+    border-bottom: 0 !important;
+  }
+  & #toolbarViewerLeft,
+  & #toolbarViewerMiddle,
+  & #editorModeButtons,
+  & #toolbarViewerRight > .toolbarHorizontalGroup:not(#editorModeButtons) {
+    background-color: var(--x-well) !important;
+    background-image: var(--x-sheen) !important;
+    border: 0 !important;
+    box-shadow: var(--x-rim), 0 6px 18px light-dark(rgb(40 50 90 / .14), rgb(0 0 0 / .4)) !important;
+    backdrop-filter: blur(18px) saturate(190%) !important;
+  }
+  & :is(.doorHanger, .doorHangerRight, #findbar, #secondaryToolbar, .editorParamsToolbar:not(#editorCommentParamsToolbar), .popupMenu, #xThemeMenu, #xColorPop, #xNotice, #xBookMenu) {
+    background-color: light-dark(rgb(250 250 253 / .78), rgb(34 34 40 / .7)) !important;
+    background-image: var(--x-sheen) !important;
+    border: 0 !important;
+    box-shadow: var(--x-rim), 0 20px 50px light-dark(rgb(40 50 90 / .2), rgb(0 0 0 / .55)) !important;
+    backdrop-filter: blur(28px) saturate(190%) !important;
+  }
+}
+/* FM-THEME END pdf */

@@ -1,0 +1,95 @@
+/* FM-THEME BEGIN paper content */
+/* ---------------- Тема: Paper ---------------- */
+@-moz-document url-prefix("about:"), url-prefix("chrome://browser/content/"), url-prefix("chrome://mozapps/"), url-prefix("chrome://global/content/") {
+  :root:not([fm-theme]:not([fm-theme="paper"])) {
+    --fm-accent: var(--fm-user-accent, #B4532A) !important;
+    --fm-on-accent: #ffffff !important;
+    --fm-frame: #efe9de !important;
+    --fm-bar: #f8f4ec !important;
+    --fm-field: #fffdf8 !important;
+    --fm-menu: #faf6ee !important;
+    --fm-ink: #2b2622 !important;
+    --fm-muted: #7a7066 !important;
+    --fm-line: rgb(43 38 34 / .16) !important;
+    --fm-hover: rgb(43 38 34 / .06) !important;
+    --fm-press: rgb(43 38 34 / .11) !important;
+    --fm-soft: color-mix(in srgb, var(--fm-user-accent, #B4532A) 14%, transparent) !important;
+    --fm-radius: 6px !important;
+    --fm-font: Georgia, Cambria, "Times New Roman", serif !important;
+    --color-accent-primary: var(--fm-accent) !important;
+    --button-background-color-primary: var(--fm-accent) !important;
+    --button-text-color-primary: var(--fm-on-accent) !important;
+    --link-color: var(--fm-accent) !important;
+    --focus-outline-color: var(--fm-accent) !important;
+    --toggle-background-color-pressed: var(--fm-accent) !important;
+    --page-nav-button-background-color-selected: var(--fm-soft) !important;
+    --page-nav-button-text-color-selected: var(--fm-accent) !important;
+    --card-border-radius: 6px !important;
+    --box-border-radius: 6px !important;
+    --button-border-radius: 4px !important;
+    --input-text-border-radius: 4px !important;
+    --select-border-radius: 4px !important;
+    --page-nav-button-border-radius: 3px !important;
+  }
+  :root:not([fm-theme]:not([fm-theme="paper"])) :is(setting-group, groupbox):not([hidden]), :root:not([fm-theme]:not([fm-theme="paper"])) .card, :root:not([fm-theme]:not([fm-theme="paper"])) .addon.card, :root:not([fm-theme]:not([fm-theme="paper"])) moz-card { border-radius: 6px !important; }
+  :root:not([fm-theme]:not([fm-theme="paper"])) button:not(.ghost-button):not([type="icon"]), :root:not([fm-theme]:not([fm-theme="paper"])) select, :root:not([fm-theme]:not([fm-theme="paper"])) menulist, :root:not([fm-theme]:not([fm-theme="paper"])) input[type="search"], :root:not([fm-theme]:not([fm-theme="paper"])) input[type="text"] { border-radius: 4px !important; }
+  :root:not([fm-theme]:not([fm-theme="paper"])) .category, :root:not([fm-theme]:not([fm-theme="paper"])) .page-nav-button { border-radius: 3px !important; }
+}
+
+@-moz-document url-prefix("chrome://noraneko-settings/") {
+  :root:not([fm-theme]:not([fm-theme="paper"])), :root:not([fm-theme]:not([fm-theme="paper"]))[data-theme], :root:not([fm-theme]:not([fm-theme="paper"])) .floorp-standard-ui {
+    --fm-accent: var(--fm-user-accent, #B4532A) !important;
+    --fm-on-accent: #ffffff !important;
+    --fm-frame: #efe9de !important;
+    --fm-bar: #f8f4ec !important;
+    --fm-field: #fffdf8 !important;
+    --fm-menu: #faf6ee !important;
+    --fm-ink: #2b2622 !important;
+    --fm-muted: #7a7066 !important;
+    --fm-line: rgb(43 38 34 / .16) !important;
+    --fm-hover: rgb(43 38 34 / .06) !important;
+    --fm-press: rgb(43 38 34 / .11) !important;
+    --fm-soft: color-mix(in srgb, var(--fm-user-accent, #B4532A) 14%, transparent) !important;
+    --fm-radius: 6px !important;
+    --fm-font: Georgia, Cambria, "Times New Roman", serif !important;
+    --floorp-brand: var(--fm-accent) !important;
+    --floorp-action: var(--fm-accent) !important;
+    --floorp-focus: var(--fm-accent) !important;
+    --floorp-switch-on: var(--fm-accent) !important;
+    --chakra-colors-purple-solid: var(--fm-accent) !important;
+    --chakra-colors-purple-fg: var(--fm-accent) !important;
+    --chakra-colors-purple-focus-ring: var(--fm-accent) !important;
+    --chakra-colors-purple-subtle: var(--fm-soft) !important;
+  }
+}
+
+@-moz-document url-prefix("chrome://noraneko-newtab/"), url("about:newtab"), url("about:home") {
+
+  html:not([fm-theme]:not([fm-theme="paper"])) { background: #f1ebdf !important; }
+  /* бумага: тёплый тон, лёгкие волокна и линейка */
+  :root:not([fm-theme]:not([fm-theme="paper"])) #root::before {
+    animation: none !important; inset: 0 !important;
+    background:
+      repeating-linear-gradient(180deg, transparent 0 35px, rgb(120 90 60 / .06) 35px 36px),
+      radial-gradient(90% 70% at 50% 40%, #fbf7ef, #ece4d5) !important;
+  }
+  :root:not([fm-theme]:not([fm-theme="paper"])) #root::after { display: none !important; }
+  :root:not([fm-theme]:not([fm-theme="paper"])) .absolute.top-4.right-4 .tabular-nums {
+    font-family: Georgia, "Times New Roman", serif !important; font-weight: 400 !important;
+    font-size: clamp(100px, 12vw, 170px) !important; color: #2b2622 !important; text-shadow: none !important;
+  }
+  :root:not([fm-theme]:not([fm-theme="paper"])) .absolute.top-4.right-4 .tabular-nums > .animate-pulse { animation: none !important; opacity: 1 !important; }
+  :root:not([fm-theme]:not([fm-theme="paper"])) .absolute.top-4.right-4 .flex-col.text-right > div { font-family: Georgia, serif !important; font-style: italic; color: #7a7066 !important; }
+  :root:not([fm-theme]:not([fm-theme="paper"])) .group.cursor-pointer:has(input[readonly]) {
+    border-radius: 0 !important; background: transparent !important; border: 0 !important;
+    box-shadow: inset 0 -2px 0 #2b2622 !important; backdrop-filter: none !important;
+  }
+  :root:not([fm-theme]:not([fm-theme="paper"])) .group.cursor-pointer:has(input[readonly]) input { font-family: Georgia, serif !important; color: #2b2622 !important; }
+  :root:not([fm-theme]:not([fm-theme="paper"])) .group.cursor-pointer:has(input[readonly]) input::placeholder { color: #8a7f74 !important; font-style: italic; }
+  :root:not([fm-theme]:not([fm-theme="paper"])) .group.cursor-pointer:has(input[readonly]) svg { color: #2b2622 !important; }
+  :root:not([fm-theme]:not([fm-theme="paper"])) .inline-block.backdrop-blur-sm.p-3 { border-radius: 4px !important; background: #faf6ee !important; border: 1px solid rgb(43 38 34 / .15) !important; box-shadow: none !important; }
+  :root:not([fm-theme]:not([fm-theme="paper"])) .inline-block.backdrop-blur-sm.p-3 * { color: #2b2622 !important; }
+  :root:not([fm-theme]:not([fm-theme="paper"])) button.fixed.bottom-4.right-4 { background: #faf6ee !important; color: #2b2622 !important; border-color: rgb(43 38 34 / .2) !important; }
+
+}
+/* FM-THEME END content */

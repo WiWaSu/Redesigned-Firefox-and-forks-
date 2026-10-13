@@ -1,4 +1,4 @@
-/* Floorp Modern Studio — тонкая настройка оформления.
+/* Redesigned Fox Studio — тонкая настройка оформления.
  *
  * Настройки лежат в pref "floorp.modern.studio" (JSON). Из них собирается
  * CSS и подключается как пользовательская таблица стилей ко всему браузеру
@@ -23,6 +23,7 @@ export const SCHEMA = [
     { key: "menuBlur", type: "range", label: "Размытие под меню", min: 0, max: 40, step: 2, unit: "px" },
   ] },
   { group: "shape", title: "Форма", items: [
+    { key: "square", type: "bool", label: "Без скруглений", hint: "Убирает все скругления: окно, вкладки, меню, кнопки, адресная строка, новая вкладка, PDF" },
     { key: "radius", type: "range", label: "Скругление страницы", min: 0, max: 36, step: 1, unit: "px" },
     { key: "gap", type: "range", label: "Отступ вокруг страницы", min: 0, max: 24, step: 1, unit: "px" },
     { key: "pageShadow", type: "range", label: "Тень под страницей", min: 0, max: 100, step: 5, unit: "%" },
@@ -32,7 +33,7 @@ export const SCHEMA = [
   ] },
   { group: "tabs", title: "Вкладки", items: [
     { key: "tabShape", type: "select", label: "Форма вкладок", options: [["pill", "Таблетки"], ["rounded", "Скруглённые"], ["square", "Прямые"], ["underline", "Подчёркивание"], ["card", "Карточки"], ["chrome", "Как в Chrome"]] },
-    { key: "tabSelected", type: "select", label: "Выбранная вкладка", options: [["soft", "Мягкий акцент"], ["accent", "Залита акцентом"], ["outline", "Обводка"], ["glass", "Стекло"], ["contrast", "Контрастная"]] },
+    { key: "tabSelected", type: "select", label: "Выбранная вкладка", options: [["soft", "Мягкий акцент"], ["accent", "Залита акцентом"], ["outline", "Обводка"], ["glass", "Стекло"], ["contrast", "Контрастная"], ["none", "Без подсветки"]] },
     { key: "tabHeight", type: "range", label: "Высота вкладок", min: 26, max: 48, step: 1, unit: "px" },
     { key: "tabMinWidth", type: "range", label: "Мин. ширина вкладки", min: 40, max: 260, step: 10, unit: "px" },
     { key: "tabClose", type: "select", label: "Крестик на вкладке", options: [["always", "Всегда"], ["hover", "При наведении"], ["never", "Скрыть"]] },
@@ -93,6 +94,7 @@ export const SCHEMA = [
     { key: "showNewTabButton", type: "bool", label: "Кнопка «Новая вкладка»" },
     { key: "showExtensions", type: "bool", label: "Кнопка расширений" },
     { key: "showNowBar", type: "bool", label: "Плашка Now Bar" },
+    { key: "showCallBar", type: "bool", label: "Плашка звонка", hint: "Сверху по центру, когда в другой вкладке идёт звонок" },
     { key: "showProgress", type: "bool", label: "Полоска загрузки страницы" },
   ] },
 ];
@@ -311,7 +313,10 @@ const TAB_SHAPES = {
       background: var(--fm-accent); scale: 0 1; transition: scale calc(.35s * var(--fm-k, 1)) var(--fm-spring, ease);
     }
     .tabbrowser-tab > .tab-stack > .tab-background { position: relative; }
-    .tabbrowser-tab[selected] > .tab-stack > .tab-background::after { scale: 1 1; }`,
+    .tabbrowser-tab[selected] > .tab-stack > .tab-background::after { scale: 1 1; }
+    /* вертикальные вкладки: полоска слева */
+    #tabbrowser-tabs[orient="vertical"] .tabbrowser-tab > .tab-stack > .tab-background::after { inset: 22% auto 22% 3px; width: 3px; height: auto; scale: 1 0; }
+    #tabbrowser-tabs[orient="vertical"] .tabbrowser-tab[selected] > .tab-stack > .tab-background::after { scale: 1 1; }`,
   card: `
     .tabbrowser-tab > .tab-stack > .tab-background { border-radius: 10px 10px 0 0 !important; margin-bottom: 0 !important; }`,
   chrome: `
@@ -330,9 +335,19 @@ const TAB_SELECTED = {
             box-shadow: inset 0 1px 0 light-dark(#fff, rgb(255 255 255 / .2)), 0 4px 14px rgb(0 0 0 / .18) !important;
             backdrop-filter: blur(12px); }
           .tabbrowser-tab[selected] .tab-label { color: inherit !important; }`,
+  none: `.tabbrowser-tab:is([selected], [multiselected]) > .tab-stack > .tab-background { background: transparent !important; box-shadow: none !important; outline: none !important; }
+         .tabbrowser-tab > .tab-stack > .tab-background::before { display: none !important; }
+         .tabbrowser-tab[selected] .tab-label { color: inherit !important; }`,
   contrast: `.tabbrowser-tab:is([selected], [multiselected]) > .tab-stack > .tab-background { background: var(--fm-ink) !important; box-shadow: none !important; }
              .tabbrowser-tab[selected] :is(.tab-label, .tab-close-button) { color: var(--fm-frame, #000) !important; fill: currentColor !important; }`,
 };
+
+/* «Без скруглений»: тот же CSS, что в square-chrome.css / square-content.css
+   (обновляется командой python3 tools/pack_themes.py) */
+// SQUARE-CSS BEGIN
+const SQUARE_CHROME = "/* Redesigned Fox: «Без скруглений» — окна браузера (LAYER заменяется на имя слоя) */\n@-moz-document url-prefix(\"chrome://\") {\n@layer LAYER {\n:root, menupopup, panel, tooltip, #urlbar, .urlbarView {\n  --fm-radius: 0px !important; --panel-border-radius: 0px !important; --arrowpanel-border-radius: 0px !important;\n  --menuitem-border-radius: 0px !important; --arrowpanel-menuitem-border-radius: 0px !important;\n  --urlbarview-border-radius: 0px !important; --urlbar-border-radius: 0px !important;\n  --toolbarbutton-border-radius: 0px !important; --tab-border-radius: 0px !important;\n  --border-radius-small: 0px !important; --border-radius-medium: 0px !important;\n  --border-radius-large: 0px !important; --border-radius-xlarge: 0px !important; --button-border-radius: 0px !important;\n}\n:not(#fm-q1#fm-q2#fm-q3):not(radio, checkbox, .radio-check, .checkbox-check, input[type=\"radio\"], input[type=\"checkbox\"], .toggle-button, moz-toggle),\n:not(#fm-q1#fm-q2#fm-q3)::before, :not(#fm-q1#fm-q2#fm-q3)::after { border-radius: 0 !important; }\n:not(#fm-q1#fm-q2#fm-q3):is(menupopup, panel, tooltip)::part(content) { border-radius: 0 !important; }\n}\n}\n";
+const SQUARE_CONTENT = "/* Redesigned Fox: «Без скруглений» — страницы браузера, новая вкладка, PDF (LAYER заменяется на имя слоя) */\n@-moz-document url-prefix(\"about:\"), url-prefix(\"chrome://\"), url-prefix(\"resource://\") {\n@layer LAYER {\n:root {\n  --fm-radius: 0px !important; --x-radius: 0px !important; --card-border-radius: 0px !important;\n  --box-border-radius: 0px !important; --button-border-radius: 0px !important; --input-text-border-radius: 0px !important;\n  --select-border-radius: 0px !important; --page-nav-button-border-radius: 0px !important;\n  --border-radius-small: 0px !important; --border-radius-medium: 0px !important;\n  --border-radius-large: 0px !important; --border-radius-xlarge: 0px !important;\n}\n:not(#fm-q1#fm-q2#fm-q3):not(input[type=\"radio\"], input[type=\"checkbox\"], .toggle-button),\n:not(#fm-q1#fm-q2#fm-q3)::before, :not(#fm-q1#fm-q2#fm-q3)::after { border-radius: 0 !important; }\n}\n}\n@layer LAYER {\n:root:has(#outerContainer #viewerContainer) { --x-radius: 0px !important; }\n:root:has(#outerContainer #viewerContainer) :not(#fm-q1#fm-q2#fm-q3),\n:root:has(#outerContainer #viewerContainer) :not(#fm-q1#fm-q2#fm-q3)::before,\n:root:has(#outerContainer #viewerContainer) :not(#fm-q1#fm-q2#fm-q3)::after { border-radius: 0 !important; }\n}\n";
+// SQUARE-CSS END
 
 const px = n => `${n}px`;
 
@@ -511,6 +526,7 @@ export function buildCss(cfgRaw) {
   hide("showNewTabButton", ":is(#new-tab-button, #tabs-newtab-button, #vertical-tabs-newtab-button)");
   hide("showExtensions", "#unified-extensions-button");
   hide("showNowBar", ".fm-nowbar");
+  hide("showCallBar", ".fm-callbar");
   hide("showProgress", ".fm-progress");
   if (c.showBookmarks === true) {
     chrome.push(`#PersonalToolbar[collapsed] { visibility: visible !important; }`);
@@ -555,13 +571,19 @@ export function buildCss(cfgRaw) {
   // Всё в слое @layer: у слоя пометки !important сильнее, чем у обычных
   // стилей userChrome.css / userContent.css, поэтому настройки всегда побеждают тему.
   const L = body => `@layer fm-studio {\n${body}\n}`;
-  const out = ["/* Floorp Modern Studio — собрано автоматически */"];
+  // порядок слоёв: Studio сильнее настроек установщика
+  const out = ["/* Redesigned Fox Studio — собрано автоматически */", "@layer fm-studio, fm-settings;"];
   const R = root.length ? `:root { ${root.join(" ")} }` : "";
-  out.push(`@-moz-document url("chrome://browser/content/browser.xhtml") {\n${L(R + "\n" + chrome.join("\n"))}\n}`);
+  // метка: окно браузера проверяет её и понимает, что стили Studio дошли
+  out.push(`@-moz-document url("chrome://browser/content/browser.xhtml") {\n${L(R + "\n:root { --fm-studio-ok: 1 !important; }\n" + chrome.join("\n"))}\n}`);
   out.push(`@-moz-document url("about:newtab"), url("about:home"), url-prefix("chrome://noraneko-newtab/") {\n${L(R + "\n" + newtab.join("\n"))}\n}`);
   if (R) {
     // PDF и встроенные страницы тоже берут акцент и скорость анимаций
     out.push(`@-moz-document url-prefix("resource://pdf.js/"), url-prefix("about:"), url-prefix("resource://pdftweaks/"), url-prefix("chrome://fmstudio/") {\n${L(R)}\n}`);
+  }
+  if (c.square === true) {
+    out.push(SQUARE_CHROME.replaceAll("@layer LAYER", "@layer fm-studio"));
+    out.push(SQUARE_CONTENT.replaceAll("@layer LAYER", "@layer fm-studio"));
   }
   return out.join("\n\n");
 }
@@ -590,6 +612,14 @@ export function readConfig() {
   }
 }
 
+let lastCss = "";
+export function currentSheet() {
+  return registered ? registered.spec : "";
+}
+export function hasConfig() {
+  return Object.keys(readConfig()).length > 0;
+}
+
 function apply() {
   const s = sss();
   if (registered && s.sheetRegistered(registered, s.USER_SHEET)) {
@@ -597,11 +627,16 @@ function apply() {
   }
   registered = null;
   const cfg = readConfig();
-  if (!Object.keys(cfg).length) {
+  lastCss = Object.keys(cfg).length ? buildCss(cfg) : "";
+  // копия собранного CSS — для проверки, что именно применилось
+  try {
+    const dir = PathUtils.join(Services.dirsvc.get("UChrm", Ci.nsIFile).path, "pdf-tweaks");
+    IOUtils.writeUTF8(PathUtils.join(dir, "fm-studio.css"), lastCss || "/* Studio: всё как в теме */").catch(() => {});
+  } catch (e) {}
+  if (!lastCss) {
     return;
   }
-  const css = buildCss(cfg);
-  registered = Services.io.newURI("data:text/css;charset=utf-8," + encodeURIComponent(css));
+  registered = Services.io.newURI("data:text/css;charset=utf-8," + encodeURIComponent(lastCss));
   s.loadAndRegisterSheet(registered, s.USER_SHEET);
 }
 
@@ -627,6 +662,14 @@ export function init() {
     return;
   }
   started = true;
+  // 1.13.0–1.13.3: браузер при восстановлении вкладки Studio заполнял все поля
+  // значениями по умолчанию (серый #808080, ползунки посередине) — такие настройки сбрасываем
+  try {
+    const c = readConfig();
+    if (c.accent === "#808080" && c.frame === "#808080" && c.ink === "#808080") {
+      Services.prefs.setStringPref(PREF, "{}");
+    }
+  } catch (e) {}
   try {
     apply();
   } catch (e) {

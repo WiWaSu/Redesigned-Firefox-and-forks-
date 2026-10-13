@@ -1,0 +1,23 @@
+/* FM-THEME BEGIN nightdrive pdf */
+/* ---------------- Тема: Night Drive ---------------- */
+:root:not([fm-theme]:not([fm-theme="nightdrive"])):has(#outerContainer #viewerContainer) {
+  & {
+    --x-accent: var(--fm-user-accent, #FFB25B) !important;
+    --x-on-accent: #1a1205 !important;
+    --x-ground: #07080d !important;
+    --x-rail: #07080d !important;
+    --x-bar: #151822 !important;
+    --x-well: #1b1f2b !important;
+    --x-field: #1b1f2b !important;
+    --x-line: rgb(255 255 255 / .08) !important;
+    --x-ink: #eef0f6 !important;
+    --x-muted: #9aa0b4 !important;
+    --x-radius: 10px !important;
+  }
+  & #toolbarViewerLeft,
+  & #toolbarViewerMiddle,
+  & #editorModeButtons,
+  & #toolbarViewerRight > .toolbarHorizontalGroup:not(#editorModeButtons) { border-radius: 999px !important; }
+  & .toolbarButton:not(.labeled) { border-radius: 999px !important; }
+}
+/* FM-THEME END pdf */

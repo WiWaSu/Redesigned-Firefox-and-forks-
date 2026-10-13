@@ -1,4 +1,4 @@
-/* Floorp Modern — новые функции окна браузера.
+/* Redesigned Fox (бывш. Floorp Modern) — новые функции окна браузера.
  * Загружается в каждое окно Floorp загрузчиком из папки программы (config.js).
  *
  *  1. Полоска загрузки страницы под панелью (цвет акцента).
@@ -10,6 +10,7 @@
  *  7. Уведомления о масштабе страницы и о выключенном звуке вкладки.
  *  8. Alt+Shift+D — закрыть повторяющиеся вкладки.
  *  9. Alt+Shift+Z — режим фокуса (прячет закладки и боковые панели).
+ * 10. Плашка звонка: звонок в другой вкладке, микрофон / камера (Alt+Shift+M).
  */
 (function () {
   "use strict";
@@ -256,10 +257,44 @@
 
   });
   safe("studio", () => {
-    /* ------- Floorp Modern Studio: тонкая настройка дизайна -------
+    /* ------- Redesigned Fox Studio: тонкая настройка дизайна -------
        Кнопка «Дизайн» на панели, пункт в меню ☰ и Alt+Shift+S. */
     const studio = ChromeUtils.importESModule("resource://pdftweaks/FloorpModernStudio.sys.mjs");
     studio.init();
+    // проверяем, что стили Studio дошли до этого окна; если нет — подключаем их прямо к окну
+    let windowSheet = "";
+    const verify = () => {
+      win.setTimeout(() => {
+        try {
+          const wu = win.windowUtils;
+          if (windowSheet) {
+            try {
+              wu.removeSheetUsingURIString(windowSheet, wu.USER_SHEET);
+            } catch (e) {}
+            windowSheet = "";
+          }
+          if (!studio.hasConfig()) {
+            return;
+          }
+          const ok = win.getComputedStyle(doc.documentElement).getPropertyValue("--fm-studio-ok").trim() === "1";
+          if (!ok) {
+            const spec = studio.currentSheet();
+            if (spec) {
+              wu.loadSheetUsingURIString(spec, wu.USER_SHEET);
+              windowSheet = spec;
+              const ok2 = win.getComputedStyle(doc.documentElement).getPropertyValue("--fm-studio-ok").trim() === "1";
+              log("studio: стили подключены к окну напрямую, " + (ok2 ? "работает" : "НЕ работает"));
+            }
+          }
+        } catch (e) {
+          log("studio: проверка стилей", e);
+        }
+      }, 250);
+    };
+    const studioObs = { observe: verify };
+    Services.prefs.addObserver("floorp.modern.studio", studioObs);
+    onUnload.push(() => Services.prefs.removeObserver("floorp.modern.studio", studioObs));
+    verify();
     // адрес chrome://fmstudio/ для страницы настроек (страница браузера с полными правами)
     try {
       Cc["@mozilla.org/chrome/chrome-registry;1"].getService(Ci.nsIChromeRegistry)
@@ -293,7 +328,8 @@
     }
     const open = w => {
       try {
-        ChromeUtils.importESModule("resource://pdftweaks/FloorpPdfTweaksParent.sys.mjs").openStudio(w);
+        const how = ChromeUtils.importESModule("resource://pdftweaks/FloorpPdfTweaksParent.sys.mjs").openStudio(w);
+        log("studio: вкладка настроек — " + how);
       } catch (e) {
         log("studio open: ОШИБКА", e);
         try {
@@ -307,8 +343,262 @@
         }
       }
     };
+    let lastOpen = 0;
+    const openOnce = w => {
+      if (Date.now() - lastOpen < 600) {
+        return;
+      }
+      lastOpen = Date.now();
+      log("studio: открываю настройки");
+      open(w);
+    };
+
+    /* ---------- темы: смена прямо в браузере ---------- */
+    let themes = null;
+    try {
+      themes = ChromeUtils.importESModule("resource://pdftweaks/FloorpModernThemes.sys.mjs");
+      themes.init();
+      const syncAttr = () => doc.documentElement.setAttribute("fm-theme", themes.current());
+      syncAttr();
+      const tObs = { observe: syncAttr };
+      Services.prefs.addObserver("floorp.modern.theme", tObs);
+      onUnload.push(() => Services.prefs.removeObserver("floorp.modern.theme", tObs));
+      log("темы: текущая " + themes.current());
+    } catch (e) {
+      log("темы: ОШИБКА", e);
+    }
+
+    /* ---------- быстрая панель по кнопке «Дизайн» ---------- */
+    const QP_CSS = `
+      #fm-quick-panel { --arrowpanel-padding: 0; }
+      #fm-quick-panel .fm-qp { display: flex; flex-direction: column; gap: 12px; width: 344px; padding: 14px; box-sizing: border-box;
+        font: menu; font-size: 13px; color: var(--fm-ink, var(--arrowpanel-color, CanvasText)); }
+      #fm-quick-panel .fm-qp-head { display: flex; align-items: center; gap: 8px; }
+      #fm-quick-panel .fm-qp-title { font-weight: 700; font-size: 15px; flex: 1; }
+      #fm-quick-panel .fm-qp-cap { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: .6; margin: 2px 2px -4px; }
+      #fm-quick-panel .fm-qp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      #fm-quick-panel .fm-qp-theme { all: unset; display: flex; flex-direction: column; gap: 5px; padding: 5px; border-radius: 12px; cursor: pointer;
+        border: 1.5px solid transparent; transition: scale calc(.3s * var(--fm-k, 1)) var(--fm-spring, ease), background-color .2s, border-color .2s; }
+      #fm-quick-panel .fm-qp-theme:hover { background: var(--fm-hover, rgb(128 128 128 / .12)); scale: 1.04; }
+      #fm-quick-panel .fm-qp-theme:active { scale: .95; }
+      #fm-quick-panel .fm-qp-theme[on] { border-color: var(--fm-accent, AccentColor); background: var(--fm-soft, rgb(128 128 128 / .12)); }
+      #fm-quick-panel .fm-qp-pv { position: relative; height: 42px; border-radius: 8px; overflow: hidden; background: var(--a);
+        box-shadow: inset 0 0 0 1px rgb(128 128 128 / .25); }
+      #fm-quick-panel .fm-qp-pv > span { position: absolute; display: block; }
+      #fm-quick-panel .fm-qp-pv > span:nth-child(1) { inset: 5px 5px auto 5px; height: 8px; border-radius: 4px; background: var(--b); }
+      #fm-quick-panel .fm-qp-pv > span:nth-child(2) { inset: 17px 5px 5px 5px; border-radius: 5px; background: var(--b); opacity: .7; }
+      #fm-quick-panel .fm-qp-pv > span:nth-child(3) { left: 10px; bottom: 9px; width: 22px; height: 6px; border-radius: 3px; background: var(--c); }
+      #fm-quick-panel .fm-qp-name { font-size: 11.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-inline: 2px; }
+      #fm-quick-panel .fm-qp-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px;
+        background: var(--fm-hover, rgb(128 128 128 / .1)); cursor: pointer; }
+      #fm-quick-panel .fm-qp-row > span:first-child { flex: 1; font-weight: 600; }
+      #fm-quick-panel .fm-qp-sw { width: 38px; height: 22px; border-radius: 11px; background: rgb(128 128 128 / .45); position: relative; transition: background-color .2s; }
+      #fm-quick-panel .fm-qp-sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 8px; background: #fff;
+        transition: translate calc(.3s * var(--fm-k, 1)) var(--fm-spring, ease); }
+      #fm-quick-panel .fm-qp-sw[on] { background: var(--fm-accent, AccentColor); }
+      #fm-quick-panel .fm-qp-sw[on]::after { translate: 16px 0; }
+      #fm-quick-panel .fm-qp-seg { display: flex; gap: 4px; padding: 3px; border-radius: 12px; background: var(--fm-hover, rgb(128 128 128 / .1)); }
+      #fm-quick-panel .fm-qp-seg > button { all: unset; flex: 1; text-align: center; padding: 6px 0; border-radius: 9px; cursor: pointer; font-weight: 600; }
+      #fm-quick-panel .fm-qp-seg > button[on] { background: var(--fm-accent, AccentColor); color: var(--fm-on-accent, #fff); }
+      #fm-quick-panel .fm-qp-dots { display: flex; gap: 8px; flex-wrap: wrap; padding-inline: 2px; }
+      #fm-quick-panel .fm-qp-dot { all: unset; width: 24px; height: 24px; border-radius: 12px; cursor: pointer; background: var(--c);
+        box-shadow: inset 0 0 0 1px rgb(128 128 128 / .35); transition: scale calc(.3s * var(--fm-k, 1)) var(--fm-spring, ease); }
+      #fm-quick-panel .fm-qp-dot:hover { scale: 1.15; }
+      #fm-quick-panel .fm-qp-dot[on] { box-shadow: 0 0 0 2px var(--fm-menu, Canvas), 0 0 0 4px var(--c); }
+      #fm-quick-panel .fm-qp-dot.auto { background: conic-gradient(#ff5c5c, #ffd25c, #5cff8a, #5cc8ff, #a35cff, #ff5c5c); }
+      #fm-quick-panel .fm-qp-more { all: unset; text-align: center; padding: 10px; border-radius: 12px; cursor: pointer; font-weight: 700;
+        background: var(--fm-accent, AccentColor); color: var(--fm-on-accent, #fff); transition: scale calc(.3s * var(--fm-k, 1)) var(--fm-spring, ease); }
+      #fm-quick-panel .fm-qp-more:hover { scale: 1.02; }
+      #fm-quick-panel .fm-qp-more:active { scale: .97; }
+    `;
+    try {
+      win.windowUtils.loadSheetUsingURIString("data:text/css;charset=utf-8," + encodeURIComponent(QP_CSS), win.windowUtils.AUTHOR_SHEET);
+    } catch (e) {
+      log("быстрая панель: стили", e);
+    }
+    const ACCENTS = ["#3E91FF", "#8E6BFF", "#FF5C8A", "#FF7A45", "#FFB020", "#2FBF71", "#14B8C4", "#9AA0A6"];
+    let panel = null;
+    let fill = null;
+    const buildPanel = () => {
+      panel = doc.createXULElement("panel");
+      panel.id = "fm-quick-panel";
+      panel.setAttribute("type", "arrow");
+      panel.setAttribute("role", "dialog");
+      panel.setAttribute("noautofocus", "true");
+      const box = el("div", "fm-qp");
+      panel.append(box);
+      (doc.getElementById("mainPopupSet") || doc.documentElement).append(panel);
+
+      const head = el("div", "fm-qp-head");
+      const title = el("div", "fm-qp-title");
+      title.textContent = "Redesigned Fox";
+      head.append(title);
+      box.append(head);
+
+      const cap = text => {
+        const c = el("div", "fm-qp-cap");
+        c.textContent = text;
+        box.append(c);
+      };
+      // темы
+      cap("Тема");
+      const grid = el("div", "fm-qp-grid");
+      box.append(grid);
+      for (const [id, name, sw] of (themes ? themes.THEMES : [])) {
+        const b = el("button", "fm-qp-theme");
+        b.dataset.id = id;
+        const pv = el("div", "fm-qp-pv");
+        pv.style.setProperty("--a", sw[0]);
+        pv.style.setProperty("--b", sw[1]);
+        pv.style.setProperty("--c", sw[2]);
+        pv.append(el("span"), el("span"), el("span"));
+        const n = el("div", "fm-qp-name");
+        n.textContent = name;
+        b.append(pv, n);
+        b.addEventListener("click", () => {
+          for (const x of grid.children) x.toggleAttribute("on", x === b);
+          themes.setTheme(id).then(ok => {
+            log("темы: выбрана " + id + (ok ? "" : " (файлы не обновлены: " + themes.lastErrors().join("; ") + ")"));
+            toast("Тема: " + name, "info");
+          }, e => {
+            log("темы: ОШИБКА", e);
+            toast("Не получилось сменить тему", "warn");
+          });
+        });
+        grid.append(b);
+      }
+      // без скруглений
+      const sq = el("div", "fm-qp-row");
+      const sqLabel = el("span");
+      sqLabel.textContent = "Без скруглений";
+      const sqSw = el("span", "fm-qp-sw");
+      sq.append(sqLabel, sqSw);
+      sq.addEventListener("click", () => {
+        const cfg = studio.readConfig();
+        if (cfg.square) {
+          delete cfg.square;
+        } else {
+          cfg.square = true;
+        }
+        studio.save(cfg);
+        sqSw.toggleAttribute("on", !!cfg.square);
+        toast(cfg.square ? "Скругления убраны" : "Скругления как в теме", "info");
+      });
+      box.append(sq);
+      // светлая / тёмная
+      cap("Оформление");
+      const seg = el("div", "fm-qp-seg");
+      for (const [v, label] of [[2, "Авто"], [1, "Светлое"], [0, "Тёмное"]]) {
+        const b = el("button");
+        b.textContent = label;
+        b.dataset.v = String(v);
+        b.addEventListener("click", () => {
+          Services.prefs.setIntPref("browser.theme.toolbar-theme", v);
+          Services.prefs.setIntPref("browser.theme.content-theme", v);
+          for (const x of seg.children) x.toggleAttribute("on", x === b);
+        });
+        seg.append(b);
+      }
+      box.append(seg);
+      // акцент
+      cap("Акцент");
+      const dots = el("div", "fm-qp-dots");
+      const auto = el("button", "fm-qp-dot auto");
+      auto.title = "Как в теме / Windows";
+      auto.dataset.c = "";
+      dots.append(auto);
+      for (const c of ACCENTS) {
+        const d = el("button", "fm-qp-dot");
+        d.style.setProperty("--c", c);
+        d.dataset.c = c;
+        d.title = c;
+        dots.append(d);
+      }
+      dots.addEventListener("click", e => {
+        const d = e.target.closest?.(".fm-qp-dot");
+        if (!d) {
+          return;
+        }
+        const cfg = studio.readConfig();
+        if (d.dataset.c) {
+          cfg.accent = d.dataset.c;
+        } else {
+          delete cfg.accent;
+        }
+        studio.save(cfg);
+        for (const x of dots.children) x.toggleAttribute("on", x === d);
+      });
+      box.append(dots);
+      // все настройки
+      const more = el("button", "fm-qp-more");
+      more.textContent = "Все настройки дизайна…";
+      more.addEventListener("click", () => {
+        panel.hidePopup();
+        openOnce(win);
+      });
+      box.append(more);
+
+      fill = () => {
+        const cur = themes ? themes.current() : "";
+        for (const x of grid.children) x.toggleAttribute("on", x.dataset.id === cur);
+        const cfg = studio.readConfig();
+        sqSw.toggleAttribute("on", !!cfg.square);
+        let mode = 2;
+        try {
+          mode = Services.prefs.getIntPref("browser.theme.toolbar-theme", 2);
+        } catch (e) {}
+        for (const x of seg.children) x.toggleAttribute("on", x.dataset.v === String(mode));
+        for (const x of dots.children) x.toggleAttribute("on", (x.dataset.c || "") === (cfg.accent || ""));
+      };
+      panel.addEventListener("popupshowing", () => fill());
+      panel.addEventListener("popuphidden", () => (lastHidden = Date.now()));
+    };
+    let lastToggle = 0;
+    let lastHidden = 0;
+    const togglePanel = node => {
+      // нажатие на кнопку при открытой панели: панель уже закрылась от этого же нажатия
+      if (Date.now() - lastToggle < 400 || Date.now() - lastHidden < 300) {
+        return;
+      }
+      lastToggle = Date.now();
+      try {
+        if (!panel) {
+          buildPanel();
+        }
+        if (panel.state === "open" || panel.state === "showing") {
+          panel.hidePopup();
+          return;
+        }
+        let anchor = node && node.isConnected && node.getBoundingClientRect().width ? node : null;
+        anchor = anchor?.querySelector?.(".toolbarbutton-icon") || anchor || doc.getElementById("PanelUI-menu-button");
+        panel.openPopup(anchor, "bottomright topright", 0, 0, false, false);
+        log("быстрая панель: открыта");
+      } catch (e) {
+        log("быстрая панель: ОШИБКА — открываю вкладку настроек", e);
+        openOnce(win);
+      }
+    };
+
     const CustomizableUI = win.CustomizableUI;
     const WIDGET = "fm-studio-button";
+    const hook = node => {
+      if (!node || node._fmHooked) {
+        return;
+      }
+      node._fmHooked = true;
+      node.addEventListener("click", e => {
+        if (e.button === 0) {
+          e.stopPropagation();
+          e.preventDefault();
+          node.ownerGlobal.FloorpModernQuickPanel?.(node);
+        }
+      });
+      node.addEventListener("command", e => {
+        e.stopPropagation();
+        node.ownerGlobal.FloorpModernQuickPanel?.(node);
+      });
+    };
+    win.FloorpModernQuickPanel = togglePanel;
     if (CustomizableUI.getWidget(WIDGET)?.provider !== CustomizableUI.PROVIDER_API) {
       try {
         CustomizableUI.createWidget({
@@ -316,13 +606,14 @@
           type: "button",
           defaultArea: CustomizableUI.AREA_NAVBAR,
           label: "Дизайн",
-          tooltiptext: "Floorp Modern Studio — настроить дизайн (Alt+Shift+S)",
-          onCommand(event) {
-            open(event.target.ownerGlobal);
+          tooltiptext: "Redesigned Fox — тема, скругления, акцент (Alt+Shift+S — все настройки)",
+          onCreated(node) {
+            hook(node);
           },
         });
       } catch (e) {}
     }
+    hook(doc.getElementById(WIDGET));
     // пункт в главном меню ☰ (меню создаётся при первом открытии)
     const addMenuItem = () => {
       const anchor = doc.getElementById("appMenu-settings-button");
@@ -332,10 +623,10 @@
       const item = doc.createXULElement("toolbarbutton");
       item.id = "appMenu-fm-studio";
       item.className = "subviewbutton";
-      item.setAttribute("label", "Дизайн (Floorp Modern)");
+      item.setAttribute("label", "Дизайн (Redesigned Fox)");
       item.addEventListener("command", () => {
         win.PanelUI?.hide();
-        open(win);
+        openOnce(win);
       });
       anchor.before(item);
     };
@@ -345,7 +636,7 @@
       if (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey && e.code === "KeyS") {
         e.preventDefault();
         e.stopPropagation();
-        open(win);
+        openOnce(win);
       }
     }, true);
   });
@@ -398,13 +689,20 @@
         return null;
       }
     };
+    // во вкладке идёт звонок (микрофон / камера) — это работа для плашки звонка
+    const inCall = tab => {
+      const w = tab._sharingState?.webRTC;
+      return !!(w && (w.microphone || w.camera)) || /camera|microphone/.test(tab.getAttribute("sharing") || "");
+    };
+    // значок звука у вкладки гаснет с задержкой ~3 с; «уже тихо» видно по soundplaying-scheduledremoval
+    const audible = tab => tab.hasAttribute("soundplaying") && !tab.hasAttribute("soundplaying-scheduledremoval");
     const pick = () => {
-      if (current && current.isConnected && (current.hasAttribute("soundplaying") || pausedByUs)) {
+      if (current && current.isConnected && !inCall(current) && (current.hasAttribute("soundplaying") || pausedByUs)) {
         return current;
       }
       pausedByUs = false;
       mutedByUs = false;
-      return [...gB.tabs].reverse().find(t => t.hasAttribute("soundplaying") && !dismissed.has(t)) || null;
+      return [...gB.tabs].reverse().find(t => t.hasAttribute("soundplaying") && !dismissed.has(t) && !inCall(t)) || null;
     };
     const render = () => {
       current = pick();
@@ -531,7 +829,16 @@
       }
       return (await Promise.all(out)).filter(Boolean);
     };
-    const still = (tab, ms) => new Promise(r => win.setTimeout(() => r(tab.isConnected && tab.hasAttribute("soundplaying")), ms));
+    const wait = ms => new Promise(r => win.setTimeout(r, ms));
+    // играет ли ещё что-то: спрашиваем саму страницу (видит и «невидимые» плееры Telegram),
+    // если страница не ответила — смотрим на значок звука вкладки
+    const stillPlaying = async tab => {
+      if (!tab.isConnected) {
+        return false;
+      }
+      const info = await pageMedia(tab, { action: "info" });
+      return info.some(x => x.playing) || audible(tab);
+    };
 
     play.addEventListener("click", async () => {
       const tab = current;
@@ -552,12 +859,19 @@
       }
       pausedByUs = true;
       render();
+      // 1) кнопка паузы самого сайта (Media Session) — так сайт видит паузу у себя в интерфейсе
       try { mc?.pause(); } catch (e) {}
-      if (await still(tab, 700)) {
-        await pageMedia(tab, { action: "pause" });
-        if (await still(tab, 1600) && !tab.hasAttribute("muted")) {
+      await wait(350);
+      // 2) ставим на паузу сами звуки страницы, в том числе невидимые (Telegram)
+      if (await stillPlaying(tab)) {
+        const r = await pageMedia(tab, { action: "pause" });
+        log("now bar: пауза на странице — " + r.map(x => x.count).join(","));
+        await wait(500);
+        // 3) не вышло — выключаем звук вкладки, чтобы «стоп» срабатывал всегда
+        if (await stillPlaying(tab) && !tab.hasAttribute("muted")) {
           tab.toggleMuteAudio();
           mutedByUs = true;
+          log("now bar: страница не остановилась, звук вкладки выключен");
         }
       }
       render();
@@ -716,6 +1030,243 @@
       tc.removeEventListener("TabAttrModified", onAttr);
       tc.removeEventListener("TabSelect", render);
     });
+  });
+
+  safe("call bar", () => {
+    /* ------------- плашка звонка: микрофон / камера заняты в другой вкладке -------------
+       Сверху по центру, как «островок» на телефоне: сайт, время звонка,
+       выключить микрофон / камеру, перейти к звонку. */
+    const gB = win.gBrowser;
+    if (!gB) {
+      return;
+    }
+    const CSS = `
+      .fm-callbar { position: absolute; left: 50%; top: 10px; z-index: 1002; display: flex; align-items: center; gap: 4px;
+        max-width: min(520px, calc(100% - 40px)); padding: 5px 6px 5px 6px; border-radius: 999px;
+        background: var(--fm-bar, #1c1d21); color: var(--fm-ink, #f2f3f5); border: 1px solid var(--fm-line, rgb(255 255 255 / .1));
+        box-shadow: 0 10px 30px rgb(0 0 0 / .35); font: 500 13px var(--fm-font, system-ui);
+        opacity: 0; translate: -50% -14px; scale: .94; pointer-events: none;
+        transition: opacity .25s ease, translate calc(.45s * var(--fm-k, 1)) var(--fm-spring, ease), scale calc(.45s * var(--fm-k, 1)) var(--fm-spring, ease), padding .3s; }
+      .fm-callbar.fm-in { opacity: 1; translate: -50% 0; scale: 1; pointer-events: auto; }
+      .fm-callbar-dot { flex: none; width: 30px; height: 30px; border-radius: 50%; position: relative; background: #2fbf71 center / 16px no-repeat;
+        -moz-context-properties: fill; fill: #fff;
+        background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='context-fill'><path d='M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z'/></svg>"); }
+      .fm-callbar[data-kind="camera"] .fm-callbar-dot { background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='context-fill'><rect x='2.5' y='6' width='13' height='12' rx='3'/><path d='M17 10.2l4.1-2.6a.6.6 0 0 1 .9.5v7.8a.6.6 0 0 1-.9.5L17 13.8z'/></svg>"); }
+      .fm-callbar-dot::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; border: 2px solid #2fbf71; animation: fm-call-ring 1.6s ease-out infinite; }
+      .fm-callbar[data-mic-off] .fm-callbar-dot { background-color: #e5484d; }
+      .fm-callbar[data-mic-off] .fm-callbar-dot::after { border-color: #e5484d; }
+      @keyframes fm-call-ring { from { opacity: .8; scale: .9; } to { opacity: 0; scale: 1.5; } }
+      .fm-callbar-text { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 0 8px; cursor: pointer; line-height: 1.2; }
+      .fm-callbar-site { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+      .fm-callbar-time { font-size: 11.5px; opacity: .7; font-variant-numeric: tabular-nums; }
+      .fm-callbar-text:hover .fm-callbar-site { color: var(--fm-accent, AccentColor); }
+      .fm-callbar-btn { flex: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; background: center / 17px no-repeat;
+        -moz-context-properties: fill; fill: currentColor; transition: background-color .2s, scale calc(.3s * var(--fm-k, 1)) var(--fm-spring, ease); }
+      .fm-callbar-btn:hover { background-color: var(--fm-hover, rgb(128 128 128 / .15)); }
+      .fm-callbar-btn:active { scale: .9; }
+      .fm-callbar-btn[hidden] { display: none; }
+      .fm-callbar-btn[data-off] { background-color: #e5484d; fill: #fff; }
+      .fm-callbar-mic { background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='context-fill' stroke-width='2' stroke-linecap='round'><rect x='9' y='3' width='6' height='11' rx='3' fill='context-fill'/><path d='M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21'/></svg>"); }
+      .fm-callbar-mic[data-off] { background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='context-fill' stroke-width='2' stroke-linecap='round'><rect x='9' y='3' width='6' height='11' rx='3' fill='context-fill'/><path d='M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M4 4l16 16'/></svg>"); }
+      .fm-callbar-cam { background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='context-fill'><rect x='2.5' y='6' width='13' height='12' rx='3'/><path d='M17 10.2l4.1-2.6a.6.6 0 0 1 .9.5v7.8a.6.6 0 0 1-.9.5L17 13.8z'/></svg>"); }
+      .fm-callbar-cam[data-off] { background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='context-fill' stroke='context-fill' stroke-width='2' stroke-linecap='round'><rect x='2.5' y='6' width='13' height='12' rx='3' stroke='none'/><path d='M17 10.2l4.1-2.6a.6.6 0 0 1 .9.5v7.8a.6.6 0 0 1-.9.5L17 13.8z' stroke='none'/><path d='M3 3l18 18' fill='none'/></svg>"); }
+      .fm-callbar-go { background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='context-fill' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'/></svg>"); }
+      .fm-callbar-hide { background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='context-fill' stroke-width='2' stroke-linecap='round'><path d='M7 7l10 10M17 7L7 17'/></svg>"); background-size: 14px; opacity: .7; }
+      .fm-callbar.fm-mini { padding: 4px 12px 4px 4px; }
+      .fm-callbar.fm-mini .fm-callbar-btn, .fm-callbar.fm-mini .fm-callbar-site { display: none; }
+      .fm-callbar.fm-mini .fm-callbar-dot { width: 24px; height: 24px; background-size: 13px; }
+      .fm-callbar.fm-mini .fm-callbar-time { font-size: 12.5px; opacity: 1; font-weight: 600; }
+    `;
+    try {
+      win.windowUtils.loadSheetUsingURIString("data:text/css;charset=utf-8," + encodeURIComponent(CSS), win.windowUtils.AUTHOR_SHEET);
+    } catch (e) {
+      log("call bar: стили", e);
+    }
+    const bar = el("div", "fm-callbar");
+    const dot = el("div", "fm-callbar-dot");
+    const text = el("div", "fm-callbar-text");
+    const site = el("div", "fm-callbar-site");
+    const time = el("div", "fm-callbar-time");
+    text.append(site, time);
+    const mic = el("div", "fm-callbar-btn fm-callbar-mic");
+    const cam = el("div", "fm-callbar-btn fm-callbar-cam");
+    const go = el("div", "fm-callbar-btn fm-callbar-go");
+    const hide = el("div", "fm-callbar-btn fm-callbar-hide");
+    mic.title = "Микрофон: выключить / включить";
+    cam.title = "Камера: выключить / включить";
+    go.title = "Перейти к звонку";
+    hide.title = "Скрыть до конца звонка";
+    bar.append(dot, text, mic, cam, go, hide);
+    host.after(bar);
+
+    const started = new WeakMap();   // вкладка → когда начался звонок
+    const muted = new WeakMap();     // вкладка → { mic, cam } выключены нами
+    const dismissed = new WeakSet();
+    let current = null;
+
+    const state = tab => {
+      const w = tab._sharingState?.webRTC || {};
+      const attr = tab.getAttribute("sharing") || "";
+      return {
+        mic: !!w.microphone || attr.includes("microphone"),
+        cam: !!w.camera || attr.includes("camera"),
+        screen: !!w.screen || attr.includes("screen"),
+      };
+    };
+    const host_ = tab => {
+      try {
+        return tab.linkedBrowser.currentURI.host.replace(/^www\./, "");
+      } catch (e) {
+        return "";
+      }
+    };
+    const fmt = ms => {
+      const t = Math.max(0, Math.floor(ms / 1000));
+      const h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, s = t % 60;
+      const p = n => String(n).padStart(2, "0");
+      return h ? `${h}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`;
+    };
+    // команды микрофону / камере — тем же способом, что и кнопки Firefox в индикаторе доступа
+    const send = (tab, name) => {
+      let n = 0;
+      try {
+        for (const bc of tab.linkedBrowser.browsingContext.getAllBrowsingContextsInSubtree()) {
+          const actor = bc.currentWindowGlobal?.getActor("WebRTC");
+          if (actor) {
+            actor.sendAsyncMessage(name);
+            n++;
+          }
+        }
+      } catch (e) {
+        log("call bar: " + name, e);
+      }
+      return n;
+    };
+
+    let timer = 0;
+    let miniTimer = 0;
+    const render = () => {
+      const calls = [...gB.tabs].filter(t => {
+        const st = state(t);
+        if (st.mic || st.cam) {
+          if (!started.has(t)) {
+            started.set(t, Date.now());
+          }
+          return true;
+        }
+        started.delete(t);
+        muted.delete(t);
+        dismissed.delete(t);
+        return false;
+      });
+      current = calls.find(t => t === current) || calls[calls.length - 1] || null;
+      const show = !!current && current !== gB.selectedTab && !dismissed.has(current);
+      bar.classList.toggle("fm-in", show);
+      doc.documentElement.toggleAttribute("fm-callbar", show);
+      win.clearInterval(timer);
+      if (!current) {
+        return;
+      }
+      const st = state(current);
+      const m = muted.get(current) || {};
+      bar.dataset.kind = st.cam ? "camera" : "phone";
+      site.textContent = (st.cam ? "Видеозвонок · " : "Звонок · ") + (host_(current) || current.label);
+      site.title = current.label;
+      mic.hidden = !st.mic;
+      cam.hidden = !st.cam;
+      mic.toggleAttribute("data-off", !!m.mic);
+      cam.toggleAttribute("data-off", !!m.cam);
+      bar.toggleAttribute("data-mic-off", !!m.mic);
+      const tick = () => {
+        if (current) {
+          time.textContent = fmt(Date.now() - (started.get(current) || Date.now())) + (m.mic ? " · микрофон выключен" : "");
+        }
+      };
+      tick();
+      if (show) {
+        timer = win.setInterval(tick, 1000);
+      }
+    };
+    const scheduleMini = () => {
+      win.clearTimeout(miniTimer);
+      miniTimer = win.setTimeout(() => {
+        if (!bar.matches(":hover")) {
+          bar.classList.add("fm-mini");
+        }
+      }, 6000);
+    };
+    bar.addEventListener("mouseenter", () => {
+      win.clearTimeout(miniTimer);
+      bar.classList.remove("fm-mini");
+    });
+    bar.addEventListener("mouseleave", scheduleMini);
+
+    const toggle = (kind, onMsg, offMsg) => {
+      if (!current) {
+        return;
+      }
+      const m = muted.get(current) || {};
+      const off = !m[kind];
+      const n = send(current, off ? onMsg : offMsg);
+      if (!n) {
+        toast("Этот браузер не даёт выключить " + (kind === "mic" ? "микрофон" : "камеру") + " отсюда — перейдите к звонку", "warn");
+        return;
+      }
+      m[kind] = off;
+      muted.set(current, m);
+      toast(kind === "mic" ? (off ? "Микрофон выключен" : "Микрофон включен") : (off ? "Камера выключена" : "Камера включена"), "info");
+      render();
+    };
+    mic.addEventListener("click", () => toggle("mic", "webrtc:MuteMicrophone", "webrtc:UnmuteMicrophone"));
+    cam.addEventListener("click", () => toggle("cam", "webrtc:MuteCamera", "webrtc:UnmuteCamera"));
+    const goTo = () => {
+      if (current) {
+        gB.selectedTab = current;
+      }
+    };
+    go.addEventListener("click", goTo);
+    text.addEventListener("click", goTo);
+    hide.addEventListener("click", () => {
+      if (current) {
+        dismissed.add(current);
+      }
+      render();
+    });
+    // Alt+Shift+M — микрофон в звонке (из любой вкладки)
+    win.addEventListener("keydown", e => {
+      if (e.altKey && e.shiftKey && !e.ctrlKey && e.code === "KeyM" && current) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggle("mic", "webrtc:MuteMicrophone", "webrtc:UnmuteMicrophone");
+      }
+    }, true);
+
+    const tc = gB.tabContainer;
+    const onAttr = e => {
+      const changed = e.detail?.changed || [];
+      if (changed.includes("sharing") || changed.includes("label") || changed.includes("busy")) {
+        render();
+      }
+    };
+    const onSelect = () => {
+      render();
+      if (bar.classList.contains("fm-in")) {
+        bar.classList.remove("fm-mini");
+        scheduleMini();
+      }
+    };
+    tc.addEventListener("TabAttrModified", onAttr);
+    tc.addEventListener("TabSelect", onSelect);
+    tc.addEventListener("TabClose", () => win.setTimeout(render, 0));
+    // запасная проверка: не во всех сборках вкладка сообщает об изменении доступа
+    const poll = win.setInterval(render, 4000);
+    onUnload.push(() => {
+      tc.removeEventListener("TabAttrModified", onAttr);
+      tc.removeEventListener("TabSelect", onSelect);
+      win.clearInterval(poll);
+      win.clearInterval(timer);
+    });
+    render();
   });
 
   safe("zoom and mute toasts", () => {

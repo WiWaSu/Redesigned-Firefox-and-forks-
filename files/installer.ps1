@@ -3,7 +3,7 @@
   [string]$Action = "install",
   # ask | all | список ключей через запятую (floorp,firefox,librewolf,...). both = all
   [string]$Target = "ask",
-  [ValidateSet("ask", "oneui", "ios", "material", "fluent", "macos", "nothing")]
+  [ValidateSet("ask", "oneui", "ios", "material", "fluent", "macos", "nothing", "nightdrive", "aero", "retro", "terminal", "paper", "cyber")]
   [string]$Theme = "ask",
   # ask | yes | no — новый просмотрщик PDF
   [ValidateSet("ask", "yes", "no")]
@@ -13,8 +13,8 @@
   # keep — не трогать; auto | light | dark
   [ValidateSet("keep", "auto", "light", "dark")]
   [string]$Mode = "keep",
-  # theme — как в теме; square | standard | round
-  [ValidateSet("theme", "square", "standard", "round")]
+  # theme — как в теме; none — без скруглений вообще; square | standard | round
+  [ValidateSet("theme", "none", "square", "standard", "round")]
   [string]$Corners = "theme",
   # анимации: apple — пружины как в iOS, smooth — плавные, system — как в Windows, off — выключены
   [ValidateSet("apple", "smooth", "system", "off")]
@@ -37,7 +37,7 @@ $ErrorActionPreference = "Stop"
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 
 # версия установщика (меняется вместе с файлом VERSION и CHANGELOG.md)
-$Version = "1.13.2"
+$Version = "1.16.0"
 $Here = $PSScriptRoot
 $Utf8 = New-Object System.Text.UTF8Encoding($false)
 $Ru = $true
@@ -64,6 +64,12 @@ $Themes = [ordered]@{
   fluent   = @{ Name = "Windows 11";        Desc = (T "Fluent: строгие углы, акцентная полоска, обои Bloom" "Fluent: crisp corners, accent underline, Bloom wallpaper") }
   macos    = @{ Name = "macOS";             Desc = (T "Светофор вместо кнопок окна, синие меню, обои-волны" "Traffic-light window buttons, blue menus, wave wallpaper") }
   nothing  = @{ Name = "Nothing";           Desc = (T "Монохром, красная точка, часы из точек" "Monochrome, red dot, dot-matrix clock") }
+  nightdrive = @{ Name = "Night Drive";     Desc = (T "Ночная дорога за запотевшим стеклом: размытые огни по краям, тонкие часы" "Night road behind a fogged window: blurred lights at the edges, thin clock") }
+  aero     = @{ Name = "Aero";              Desc = (T "Windows 7: голубое стекло с бликом, глянцевые кнопки" "Windows 7: glossy blue glass, shiny buttons") }
+  retro    = @{ Name = "Retro 98";          Desc = (T "Windows 98: серые выпуклые кнопки, синие заголовки, никаких скруглений" "Windows 98: grey bevelled buttons, navy title bars, no rounding") }
+  terminal = @{ Name = "Terminal";          Desc = (T "Зелёный фосфор, моноширинный шрифт, строки развёртки" "Green phosphor, monospace font, scanlines") }
+  paper    = @{ Name = "Paper";             Desc = (T "Тёплая бумага, шрифт с засечками, плоско и спокойно" "Warm paper, serif font, flat and calm") }
+  cyber    = @{ Name = "Cyberpunk";         Desc = (T "Срезанные углы, жёлтый неон, розово-голубой город" "Cut corners, yellow neon, pink and cyan city") }
 }
 
 # ================================================================ браузеры (Firefox и форки)
@@ -275,11 +281,18 @@ function Get-SettingsCss($o) {
   if (-not $o.Clock)     { $newtab += "  .absolute.top-4.right-4 { display: none !important; }"; $newtab += "  :root:has(#fm-clock) .outer-wrapper { padding-top: revert !important; }" }
   if (-not $o.Wallpaper) { $newtab += "  #root::before { animation: none !important; }" }
 
+  # всё в слое fm-settings: настройки сильнее темы, а Studio (слой fm-studio) — сильнее настроек
   $head = "/* ---------------- Настройки из установщика ---------------- */"
-  $c = @($head) + $chrome
-  $t = @($head) + $global
-  if ($content.Count) { $t += '@-moz-document url-prefix("about:"), url-prefix("chrome://browser/content/") {'; $t += $content; $t += "}" }
-  if ($newtab.Count) { $t += '@-moz-document url-prefix("chrome://noraneko-newtab/"), url("about:newtab"), url("about:home") {'; $t += $newtab; $t += "}" }
+  $order = "@layer fm-studio, fm-settings;"
+  $c = @($head, $order, "@layer fm-settings {") + $chrome + @("}")
+  $t = @($head, $order, "@layer fm-settings {") + $global + @("}")
+  if ($content.Count) { $t += '@-moz-document url-prefix("about:"), url-prefix("chrome://browser/content/") {'; $t += "@layer fm-settings {"; $t += $content; $t += "}"; $t += "}" }
+  if ($newtab.Count) { $t += '@-moz-document url-prefix("chrome://noraneko-newtab/"), url("about:newtab"), url("about:home") {'; $t += "@layer fm-settings {"; $t += $newtab; $t += "}"; $t += "}" }
+  if ($o.Corners -eq "none") {
+    # без скруглений вообще: окно, меню, вкладки, страницы браузера, новая вкладка, PDF
+    $c += (Read-Text (Join-Path $Here "pdf-tweaks\square-chrome.css")).Replace("@layer LAYER", "@layer fm-settings")
+    $t += (Read-Text (Join-Path $Here "pdf-tweaks\square-content.css")).Replace("@layer LAYER", "@layer fm-settings")
+  }
   return @{ Chrome = ($c -join "`n"); Content = ($t -join "`n") }
 }
 
@@ -287,14 +300,14 @@ function Get-Blocks($o) {
   $chrome  = Read-Text (Join-Path $Here "floorp-modern-chrome.css")
   $content = Read-Text (Join-Path $Here "floorp-modern-content.css")
   $pdf     = Read-Text (Join-Path $Here "pdf-viewer-theme.css")
-  if ($o.Theme -ne "oneui") {
-    foreach ($part in @("chrome", "content", "pdf")) {
-      if (-not (Test-Path (Join-Path $Here "themes\$($o.Theme)-$part.css"))) { throw (T "нет файла темы themes\$($o.Theme)-$part.css" "missing theme file themes\$($o.Theme)-$part.css") }
-    }
-    $chrome  = Add-Overlay $chrome  (Read-Text (Join-Path $Here "themes\$($o.Theme)-chrome.css"))  "FLOORP-MODERN END"
-    $content = Add-Overlay $content (Read-Text (Join-Path $Here "themes\$($o.Theme)-content.css")) "FLOORP-MODERN END"
-    $pdf     = Add-Overlay $pdf     (Read-Text (Join-Path $Here "themes\$($o.Theme)-pdf.css"))     "PDF-TWEAKS END"
+  # тема вписывается между метками FM-THEME BEGIN/END — браузер умеет менять её сам (кнопка «Дизайн»)
+  $tdir = Join-Path $Here "pdf-tweaks\themes"
+  foreach ($part in @("chrome", "content", "pdf")) {
+    if (-not (Test-Path (Join-Path $tdir "$($o.Theme)-$part.css"))) { throw (T "нет файла темы pdf-tweaks\themes\$($o.Theme)-$part.css" "missing theme file pdf-tweaks\themes\$($o.Theme)-$part.css") }
   }
+  $chrome  = Add-Overlay $chrome  (Read-Text (Join-Path $tdir "$($o.Theme)-chrome.css"))  "FLOORP-MODERN END"
+  $content = Add-Overlay $content (Read-Text (Join-Path $tdir "$($o.Theme)-content.css")) "FLOORP-MODERN END"
+  $pdf     = Add-Overlay $pdf     (Read-Text (Join-Path $tdir "$($o.Theme)-pdf.css"))     "PDF-TWEAKS END"
   $s = Get-SettingsCss $o
   $chrome  = Add-Overlay $chrome  $s.Chrome  "FLOORP-MODERN END"
   $content = Add-Overlay $content $s.Content "FLOORP-MODERN END"
@@ -352,7 +365,7 @@ function Close-Browser($key) {
   if ($script:GuiWindow) {
     $msg = T "$($b.Name) сейчас открыт. Закрыть его, чтобы применить оформление?`n(Вкладки восстановятся при следующем запуске.)" `
              "$($b.Name) is running. Close it to apply the theme?`n(Tabs are restored on next start.)"
-    $r = [System.Windows.MessageBox]::Show($msg, "Floorp Modern", "YesNo", "Question")
+    $r = [System.Windows.MessageBox]::Show($msg, "Redesigned Fox", "YesNo", "Question")
     if ($r -ne "Yes") { return $false }
     foreach ($p in $procs) { try { [void]$p.CloseMainWindow() } catch {} }
     for ($i = 0; $i -lt 16 -and (Get-Process -Name $b.Process -ErrorAction SilentlyContinue); $i++) {
@@ -439,6 +452,7 @@ function Invoke-Modern($action, $keys, $o) {
           $prefs = Set-PrefLine $prefs "floorp.modern.nowbar" $(if ($o.NowBar) { "true" } else { "false" })
           $prefs = Set-Wallpaper $o $chrome $prefs
           $prefs = Set-PrefLine $prefs "floorp.modern.version" ('"' + $Version + '"')
+          $prefs = Set-PrefLine $prefs "floorp.modern.theme" ('"' + $o.Theme + '"')
           if ($o.Mode -ne "keep") {
             $v = @{ dark = 0; light = 1; auto = 2 }[$o.Mode]
             $prefs = Set-PrefLine $prefs "browser.theme.toolbar-theme" $v
@@ -528,6 +542,12 @@ $PreviewLook = @{
   fluent   = @{ Frame = @("#202020");                         Bar = "#2D2D2D"; BarR = 4;  Card = @("#07122B", "#2860E6", "#0A1838"); CardR = 6;  Clock = "SemiBold"; Font = "Segoe UI Variable Display"; ClockFg = "#FFFFFF"; Search = "#E6202020"; SearchR = 5;  Lights = $false; Swatch = @("#0B2A6B", "#78AAFF") }
   macos    = @{ Frame = @("#1F1E23");                         Bar = "#38373D"; BarR = 7;  Card = @("#3A1D5C", "#C846A0", "#FF8C3C"); CardR = 9;  Clock = "SemiBold"; Font = "Segoe UI Variable Display"; ClockFg = "#EBFFFFFF"; Search = "#29FFFFFF"; SearchR = 8;  Lights = $true;  Swatch = @("#3A1D5C", "#FF8C3C") }
   nothing  = @{ Frame = @("#000000");                         Bar = "#000000"; BarR = 13; Card = @("#000000", "#000000", "#0D0D0D"); CardR = 14; Clock = "Black";    Font = "Consolas";                  ClockFg = "#FFFFFF"; Search = "#000000"; SearchR = 11; Lights = $false; Swatch = @("#000000", "#D71921") }
+  nightdrive = @{ Frame = @("#07080D");                       Bar = "#151822"; BarR = 7;  Card = @("#3A0A0A", "#05060B", "#3A2A0A"); CardR = 12; Clock = "Light";    Font = "Segoe UI Variable Display"; ClockFg = "#F0FFFFFF"; Search = "#14FFFFFF"; SearchR = 8;  Lights = $false; Swatch = @("#FF3C32", "#05060B", "#FFB25B") }
+  aero     = @{ Frame = @("#9FC2EA", "#C9DCF2");              Bar = "#C0FFFFFF"; BarR = 3; Card = @("#0B4FA8", "#3FA0E0", "#0A2F6B"); CardR = 5;  Clock = "Light";    Font = "Segoe UI";                  ClockFg = "#FFFFFF"; Search = "#80FFFFFF"; SearchR = 4;  Lights = $false; Swatch = @("#5AA2EC", "#1F62B5") }
+  retro    = @{ Frame = @("#C0C0C0");                         Bar = "#FFFFFF"; BarR = 0;  Card = @("#008080");                       CardR = 0;  Clock = "Bold";     Font = "Courier New";               ClockFg = "#000000"; Search = "#FFFFFF"; SearchR = 0;  Lights = $false; Swatch = @("#C0C0C0", "#000080") }
+  terminal = @{ Frame = @("#030603");                         Bar = "#000000"; BarR = 1;  Card = @("#010301", "#0F3A18", "#010301"); CardR = 1;  Clock = "Normal";   Font = "Consolas";                  ClockFg = "#5CFF85"; Search = "#000000"; SearchR = 0;  Lights = $false; Swatch = @("#000000", "#33FF66") }
+  paper    = @{ Frame = @("#EFE9DE");                         Bar = "#FFFDF8"; BarR = 3;  Card = @("#FBF7EF", "#ECE4D5");            CardR = 4;  Clock = "Normal";   Font = "Georgia";                   ClockFg = "#2B2622"; Search = "#00FFFFFF"; SearchR = 0;  Lights = $false; Swatch = @("#F4EFE6", "#B4532A") }
+  cyber    = @{ Frame = @("#0B0912");                         Bar = "#1A1526"; BarR = 0;  Card = @("#0A0614", "#4A0B4E", "#07050D"); CardR = 2;  Clock = "Bold";     Font = "Bahnschrift";               ClockFg = "#FCEE0A"; Search = "#D90A0614"; SearchR = 0;  Lights = $false; Swatch = @("#FCEE0A", "#FF00AA", "#00F0FF") }
 }
 $AccentPresets = @("#0A84FF", "#8E6BFF", "#FF375F", "#FF453A", "#FF9F0A", "#30D158", "#40C8E0", "#8E8E93")
 
@@ -536,7 +556,7 @@ function Show-Gui {
   $xaml = @'
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Floorp Modern" Width="540" SizeToContent="Height" WindowStartupLocation="CenterScreen"
+        Title="Redesigned Fox" Width="540" SizeToContent="Height" WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize" Background="Transparent"
         FontFamily="Segoe UI Variable Display, Segoe UI" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
   <WindowChrome.WindowChrome>
@@ -798,7 +818,7 @@ function Show-Gui {
             </Border>
             <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
               <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Floorp Modern" Foreground="{StaticResource Ink}" FontSize="24" FontWeight="Bold"/>
+                <TextBlock Text="Redesigned Fox" Foreground="{StaticResource Ink}" FontSize="24" FontWeight="Bold"/>
                 <Border CornerRadius="9" Background="#1FFFFFFF" BorderBrush="{StaticResource Rim}" BorderThickness="1" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
                   <TextBlock x:Name="VersionLabel" Foreground="{StaticResource Muted}" FontSize="12" FontWeight="SemiBold"/>
                 </Border>
@@ -844,7 +864,7 @@ function Show-Gui {
               </Grid>
             </Border>
             <TextBlock x:Name="ThemeCaption" Style="{StaticResource Caption}"/>
-            <UniformGrid x:Name="ThemeGrid" Columns="3" Margin="-5,0,-5,0"/>
+            <UniformGrid x:Name="ThemeGrid" Columns="4" Margin="-5,0,-5,0"/>
             <TextBlock x:Name="ThemeHint" Foreground="{StaticResource Muted}" FontSize="13" Margin="16,8,16,0" TextWrapping="Wrap" MinHeight="34"/>
             <TextBlock x:Name="WallCaption" Style="{StaticResource Caption}"/>
             <Border Style="{StaticResource Cell}" Padding="14,14,6,6">
@@ -880,8 +900,9 @@ function Show-Gui {
             </Border>
             <TextBlock x:Name="CornersCaption" Style="{StaticResource Caption}"/>
             <Border Style="{StaticResource Cell}" CornerRadius="16" Padding="3">
-              <UniformGrid Columns="4">
+              <UniformGrid Columns="5">
                 <RadioButton x:Name="CornTheme" Style="{StaticResource Seg}" GroupName="corn" IsChecked="True"/>
+                <RadioButton x:Name="CornNone" Style="{StaticResource Seg}" GroupName="corn"/>
                 <RadioButton x:Name="CornSquare" Style="{StaticResource Seg}" GroupName="corn"/>
                 <RadioButton x:Name="CornStandard" Style="{StaticResource Seg}" GroupName="corn"/>
                 <RadioButton x:Name="CornRound" Style="{StaticResource Seg}" GroupName="corn"/>
@@ -1031,7 +1052,7 @@ public static extern int DwmSetWindowAttribute(System.IntPtr hwnd, int attr, ref
 
   # ---------- тексты ----------
   (& $get "VersionLabel").Text = "v$Version"
-  $window.Title = "Floorp Modern $Version"
+  $window.Title = "Redesigned Fox $Version"
   (& $get "Subtitle").Text = T "Новый вид для Floorp, Firefox и их форков" "A fresh look for Floorp, Firefox and forks"
   (& $get "Step1").Content = T "1  Тема" "1  Theme"
   (& $get "Step2").Content = T "2  Настройка" "2  Customize"
@@ -1046,6 +1067,7 @@ public static extern int DwmSetWindowAttribute(System.IntPtr hwnd, int attr, ref
   (& $get "ModeDark").Content = T "Тёмная" "Dark"
   (& $get "CornersCaption").Text = T "СКРУГЛЕНИЕ СТРАНИЦЫ И МЕНЮ" "PAGE AND MENU CORNERS"
   (& $get "CornTheme").Content = T "Как в теме" "Theme"
+  (& $get "CornNone").Content = T "Без" "None"
   (& $get "CornSquare").Content = T "Строгие" "Square"
   (& $get "CornStandard").Content = T "Обычные" "Standard"
   (& $get "CornRound").Content = T "Круглые" "Round"
@@ -1111,8 +1133,8 @@ public static extern int DwmSetWindowAttribute(System.IntPtr hwnd, int attr, ref
       $card.Background = & $grad $WallPresets[[string]$opt.Wall].Colors
     }
     $r = $L.CardR
-    $rc = @{ square = 4; standard = 12; round = 20 }[$opt.Corners]
-    if ($rc) { $r = $rc }
+    $rc = @{ none = 0; square = 4; standard = 12; round = 20 }[$opt.Corners]
+    if ($rc -ne $null) { $r = $rc }
     $card.CornerRadius = New-Object Windows.CornerRadius ($r)
     $clock = & $get "PrevClock"
     $clock.FontWeight = [Windows.FontWeights]::($L.Clock)
@@ -1229,7 +1251,7 @@ public static extern int DwmSetWindowAttribute(System.IntPtr hwnd, int attr, ref
     if ($opt.Mode -eq $pair[1]) { $rb.IsChecked = $true }
     $rb.Add_Checked({ param($s) $opt.Mode = [string]$s.Tag })
   }
-  foreach ($pair in @(@("CornTheme", "theme"), @("CornSquare", "square"), @("CornStandard", "standard"), @("CornRound", "round"))) {
+  foreach ($pair in @(@("CornTheme", "theme"), @("CornNone", "none"), @("CornSquare", "square"), @("CornStandard", "standard"), @("CornRound", "round"))) {
     $rb = & $get $pair[0]; $rb.Tag = $pair[1]
     if ($opt.Corners -eq $pair[1]) { $rb.IsChecked = $true }
     $rb.Add_Checked({ param($s) $opt.Corners = [string]$s.Tag; & $applyLook })
@@ -1344,7 +1366,7 @@ public static extern int DwmSetWindowAttribute(System.IntPtr hwnd, int attr, ref
     if ($script:guiFinished) { $window.Close(); return }
     $keys = @($browserBoxes.Keys | Where-Object { $browserBoxes[$_].IsChecked })
     if ($keys.Count -eq 0) {
-      [System.Windows.MessageBox]::Show((T "Включите хотя бы один браузер." "Turn on at least one browser."), "Floorp Modern") | Out-Null
+      [System.Windows.MessageBox]::Show((T "Включите хотя бы один браузер." "Turn on at least one browser."), "Redesigned Fox") | Out-Null
       return
     }
     # порядок как в списке браузеров
@@ -1398,7 +1420,7 @@ if ($Gui) {
   } catch {
     try {
       Add-Type -AssemblyName System.Windows.Forms
-      [System.Windows.Forms.MessageBox]::Show((T "Окно установщика не открылось. Запустите install.cmd — он сделает то же самое в консоли.`n`n" "The setup window failed to open. Run install.cmd instead.`n`n") + $_.Exception.Message, "Floorp Modern") | Out-Null
+      [System.Windows.Forms.MessageBox]::Show((T "Окно установщика не открылось. Запустите install.cmd — он сделает то же самое в консоли.`n`n" "The setup window failed to open. Run install.cmd instead.`n`n") + $_.Exception.Message, "Redesigned Fox") | Out-Null
     } catch {}
     exit 1
   }
@@ -1407,7 +1429,7 @@ if ($Gui) {
 
 # ---------------- консольный режим ----------------
 Say ""
-Say "Floorp Modern $Version" Cyan
+Say "Redesigned Fox $Version" Cyan
 if ($found.Count -eq 0) {
   Say (T "Не нашёл ни одного браузера на движке Firefox (Floorp, Firefox, LibreWolf, Waterfox, Zen, Mercury)." "No Firefox-based browser found.") Red
   if (-not $SkipAdmin) { Read-Host (T "Нажмите Enter" "Press Enter") | Out-Null }

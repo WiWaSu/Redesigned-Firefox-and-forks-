@@ -1,0 +1,23 @@
+/* FM-THEME BEGIN paper pdf */
+/* ---------------- Тема: Paper ---------------- */
+:root:not([fm-theme]:not([fm-theme="paper"])):has(#outerContainer #viewerContainer) {
+  & {
+    --x-accent: var(--fm-user-accent, #B4532A) !important;
+    --x-on-accent: #ffffff !important;
+    --x-ground: #efe9de !important;
+    --x-rail: #efe9de !important;
+    --x-bar: #f8f4ec !important;
+    --x-well: #fffdf8 !important;
+    --x-field: #fffdf8 !important;
+    --x-line: rgb(43 38 34 / .16) !important;
+    --x-ink: #2b2622 !important;
+    --x-muted: #7a7066 !important;
+    --x-radius: 10px !important;
+  }
+  & #toolbarViewerLeft,
+  & #toolbarViewerMiddle,
+  & #editorModeButtons,
+  & #toolbarViewerRight > .toolbarHorizontalGroup:not(#editorModeButtons) { border-radius: 4px !important; }
+  & .toolbarButton:not(.labeled) { border-radius: 4px !important; }
+}
+/* FM-THEME END pdf */

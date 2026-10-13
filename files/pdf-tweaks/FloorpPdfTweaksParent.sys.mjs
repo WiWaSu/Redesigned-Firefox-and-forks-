@@ -78,22 +78,32 @@ function studioRegistered() {
   }
 }
 export function openStudio(win) {
-  if (!win) {
-    return;
+  if (!win || !win.gBrowser) {
+    return "";
   }
+  const gB = win.gBrowser;
   const url = studioRegistered() ? STUDIO_URL : STUDIO_FALLBACK;
   const principal = Services.scriptSecurityManager.getSystemPrincipal();
-  // уже открыта — переключаемся и открываем заново (вдруг там была ошибка)
-  for (const tab of win.gBrowser.tabs) {
+  // уже открыта и видна — просто переключаемся на неё и обновляем.
+  // Вкладку из другого рабочего пространства Floorp (она скрыта) закрываем —
+  // переключиться на скрытую вкладку нельзя, из-за этого кнопка «молчала».
+  for (const tab of [...gB.tabs]) {
     const spec = tab.linkedBrowser?.currentURI?.spec || "";
     if (spec.startsWith(STUDIO_URL) || spec.startsWith(STUDIO_FALLBACK)) {
-      win.gBrowser.selectedTab = tab;
+      if (tab.hidden || tab.closing) {
+        try {
+          gB.removeTab(tab, { animate: false });
+        } catch (e) {}
+        continue;
+      }
+      gB.selectedTab = tab;
       tab.linkedBrowser.loadURI(Services.io.newURI(url), { triggeringPrincipal: principal });
-      return;
+      return "switched";
     }
   }
-  const tab = win.gBrowser.addTrustedTab(url, { triggeringPrincipal: principal });
-  win.gBrowser.selectedTab = tab;
+  const tab = gB.addTrustedTab(url, { triggeringPrincipal: principal, inBackground: false });
+  gB.selectedTab = tab;
+  return "opened";
 }
 
 const WALL_IDS = ["theme", "custom", "aurora", "iris", "sunset", "ocean", "forest", "night", "rose", "graphite", "bloom", "dune"];
@@ -163,6 +173,23 @@ export class FloorpPdfTweaksParent extends JSWindowActorParent {
         studio.save(JSON.parse(String(msg.data || "{}")));
       } catch (e) {
         bootLog.push({ t: new Date().toISOString(), msg: "Studio: ОШИБКА " + e });
+        writeLog();
+      }
+      return null;
+    }
+    if (msg.name === "PdfTweaks:theme-set") {
+      const spec = this.manager.documentURI?.spec || "";
+      if (!/^(resource:\/\/pdftweaks\/|chrome:\/\/fmstudio\/content\/)studio\.html/.test(spec)) {
+        return null;
+      }
+      try {
+        const themes = ChromeUtils.importESModule("resource://pdftweaks/FloorpModernThemes.sys.mjs");
+        themes.setTheme(String(msg.data || "")).catch(e => {
+          bootLog.push({ t: new Date().toISOString(), msg: "тема: ОШИБКА " + e });
+          writeLog();
+        });
+      } catch (e) {
+        bootLog.push({ t: new Date().toISOString(), msg: "тема: ОШИБКА " + e });
         writeLog();
       }
       return null;

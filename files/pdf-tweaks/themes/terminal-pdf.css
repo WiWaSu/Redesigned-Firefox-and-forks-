@@ -1,0 +1,23 @@
+/* FM-THEME BEGIN terminal pdf */
+/* ---------------- Тема: Terminal ---------------- */
+:root:not([fm-theme]:not([fm-theme="terminal"])):has(#outerContainer #viewerContainer) {
+  & {
+    --x-accent: var(--fm-user-accent, #33FF66) !important;
+    --x-on-accent: #000000 !important;
+    --x-ground: #030603 !important;
+    --x-rail: #030603 !important;
+    --x-bar: #081108 !important;
+    --x-well: #000000 !important;
+    --x-field: #000000 !important;
+    --x-line: rgb(51 255 102 / .28) !important;
+    --x-ink: #5CFF85 !important;
+    --x-muted: #2BA84C !important;
+    --x-radius: 10px !important;
+  }
+  & #toolbarViewerLeft,
+  & #toolbarViewerMiddle,
+  & #editorModeButtons,
+  & #toolbarViewerRight > .toolbarHorizontalGroup:not(#editorModeButtons) { border-radius: 2px !important; }
+  & .toolbarButton:not(.labeled) { border-radius: 2px !important; }
+}
+/* FM-THEME END pdf */

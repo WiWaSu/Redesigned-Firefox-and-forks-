@@ -1,0 +1,23 @@
+/* FM-THEME BEGIN cyber pdf */
+/* ---------------- Тема: Cyberpunk ---------------- */
+:root:not([fm-theme]:not([fm-theme="cyber"])):has(#outerContainer #viewerContainer) {
+  & {
+    --x-accent: var(--fm-user-accent, #FCEE0A) !important;
+    --x-on-accent: #000000 !important;
+    --x-ground: #0b0912 !important;
+    --x-rail: #0b0912 !important;
+    --x-bar: #15111f !important;
+    --x-well: #1a1526 !important;
+    --x-field: #1a1526 !important;
+    --x-line: rgb(255 0 170 / .32) !important;
+    --x-ink: #f3f0ff !important;
+    --x-muted: #a497cc !important;
+    --x-radius: 10px !important;
+  }
+  & #toolbarViewerLeft,
+  & #toolbarViewerMiddle,
+  & #editorModeButtons,
+  & #toolbarViewerRight > .toolbarHorizontalGroup:not(#editorModeButtons) { border-radius: 2px !important; }
+  & .toolbarButton:not(.labeled) { border-radius: 2px !important; }
+}
+/* FM-THEME END pdf */

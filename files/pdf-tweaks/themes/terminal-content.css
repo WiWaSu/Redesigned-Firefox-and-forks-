@@ -1,0 +1,99 @@
+/* FM-THEME BEGIN terminal content */
+/* ---------------- Тема: Terminal ---------------- */
+@-moz-document url-prefix("about:"), url-prefix("chrome://browser/content/"), url-prefix("chrome://mozapps/"), url-prefix("chrome://global/content/") {
+  :root:not([fm-theme]:not([fm-theme="terminal"])) {
+    --fm-accent: var(--fm-user-accent, #33FF66) !important;
+    --fm-on-accent: #000000 !important;
+    --fm-frame: #030603 !important;
+    --fm-bar: #081108 !important;
+    --fm-field: #000000 !important;
+    --fm-menu: #061006 !important;
+    --fm-ink: #5CFF85 !important;
+    --fm-muted: #2BA84C !important;
+    --fm-line: rgb(51 255 102 / .28) !important;
+    --fm-hover: rgb(51 255 102 / .1) !important;
+    --fm-press: rgb(51 255 102 / .18) !important;
+    --fm-soft: rgb(51 255 102 / .14) !important;
+    --fm-radius: 2px !important;
+    --fm-font: "Cascadia Mono", "Cascadia Code", Consolas, ui-monospace, monospace !important;
+    --color-accent-primary: var(--fm-accent) !important;
+    --button-background-color-primary: var(--fm-accent) !important;
+    --button-text-color-primary: var(--fm-on-accent) !important;
+    --link-color: var(--fm-accent) !important;
+    --focus-outline-color: var(--fm-accent) !important;
+    --toggle-background-color-pressed: var(--fm-accent) !important;
+    --page-nav-button-background-color-selected: var(--fm-soft) !important;
+    --page-nav-button-text-color-selected: var(--fm-accent) !important;
+    --card-border-radius: 2px !important;
+    --box-border-radius: 2px !important;
+    --button-border-radius: 2px !important;
+    --input-text-border-radius: 2px !important;
+    --select-border-radius: 2px !important;
+    --page-nav-button-border-radius: 2px !important;
+  }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) :is(setting-group, groupbox):not([hidden]), :root:not([fm-theme]:not([fm-theme="terminal"])) .card, :root:not([fm-theme]:not([fm-theme="terminal"])) .addon.card, :root:not([fm-theme]:not([fm-theme="terminal"])) moz-card { border-radius: 2px !important; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) button:not(.ghost-button):not([type="icon"]), :root:not([fm-theme]:not([fm-theme="terminal"])) select, :root:not([fm-theme]:not([fm-theme="terminal"])) menulist, :root:not([fm-theme]:not([fm-theme="terminal"])) input[type="search"], :root:not([fm-theme]:not([fm-theme="terminal"])) input[type="text"] { border-radius: 2px !important; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .category, :root:not([fm-theme]:not([fm-theme="terminal"])) .page-nav-button { border-radius: 2px !important; }
+}
+
+@-moz-document url-prefix("chrome://noraneko-settings/") {
+  :root:not([fm-theme]:not([fm-theme="terminal"])), :root:not([fm-theme]:not([fm-theme="terminal"]))[data-theme], :root:not([fm-theme]:not([fm-theme="terminal"])) .floorp-standard-ui {
+    --fm-accent: var(--fm-user-accent, #33FF66) !important;
+    --fm-on-accent: #000000 !important;
+    --fm-frame: #030603 !important;
+    --fm-bar: #081108 !important;
+    --fm-field: #000000 !important;
+    --fm-menu: #061006 !important;
+    --fm-ink: #5CFF85 !important;
+    --fm-muted: #2BA84C !important;
+    --fm-line: rgb(51 255 102 / .28) !important;
+    --fm-hover: rgb(51 255 102 / .1) !important;
+    --fm-press: rgb(51 255 102 / .18) !important;
+    --fm-soft: rgb(51 255 102 / .14) !important;
+    --fm-radius: 2px !important;
+    --fm-font: "Cascadia Mono", "Cascadia Code", Consolas, ui-monospace, monospace !important;
+    --floorp-brand: var(--fm-accent) !important;
+    --floorp-action: var(--fm-accent) !important;
+    --floorp-focus: var(--fm-accent) !important;
+    --floorp-switch-on: var(--fm-accent) !important;
+    --chakra-colors-purple-solid: var(--fm-accent) !important;
+    --chakra-colors-purple-fg: var(--fm-accent) !important;
+    --chakra-colors-purple-focus-ring: var(--fm-accent) !important;
+    --chakra-colors-purple-subtle: var(--fm-soft) !important;
+  }
+}
+
+@-moz-document url-prefix("chrome://noraneko-newtab/"), url("about:newtab"), url("about:home") {
+
+  html:not([fm-theme]:not([fm-theme="terminal"])) { background: #010301 !important; }
+  /* экран старого монитора: строки развёртки и свечение */
+  :root:not([fm-theme]:not([fm-theme="terminal"])) #root::before {
+    animation: none !important; inset: 0 !important;
+    background:
+      repeating-linear-gradient(180deg, rgb(0 0 0 / .35) 0 1px, transparent 1px 3px),
+      radial-gradient(80% 70% at 50% 45%, rgb(20 80 35 / .55), transparent 75%),
+      #010301 !important;
+  }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) #root::after { content: "" !important; position: fixed !important; inset: 0 !important; z-index: -1 !important; pointer-events: none !important;
+    background: radial-gradient(120% 100% at 50% 50%, transparent 60%, rgb(0 0 0 / .8)) !important; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .absolute.top-4.right-4 .tabular-nums {
+    font-family: "Cascadia Mono", Consolas, monospace !important; font-weight: 400 !important;
+    font-size: clamp(90px, 11vw, 160px) !important; color: #5CFF85 !important;
+    text-shadow: 0 0 10px rgb(51 255 102 / .8), 0 0 40px rgb(51 255 102 / .35) !important;
+  }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .absolute.top-4.right-4 .tabular-nums::after { content: "_"; animation: fm-blink 1.1s steps(1) infinite; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .absolute.top-4.right-4 .tabular-nums > .animate-pulse { animation: none !important; opacity: 1 !important; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .absolute.top-4.right-4 .flex-col.text-right > div { font-family: "Cascadia Mono", Consolas, monospace !important; color: #2BA84C !important; text-transform: uppercase; letter-spacing: .15em; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .absolute.top-4.right-4 .flex-col.text-right > div:first-child::before { content: "> "; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .group.cursor-pointer:has(input[readonly]) {
+    border-radius: 0 !important; background: #000 !important; border: 1px solid rgb(51 255 102 / .5) !important;
+    box-shadow: 0 0 18px rgb(51 255 102 / .2) !important;
+  }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .group.cursor-pointer:has(input[readonly]) input { font-family: "Cascadia Mono", Consolas, monospace !important; color: #5CFF85 !important; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .group.cursor-pointer:has(input[readonly]) input::placeholder { color: #2BA84C !important; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .group.cursor-pointer:has(input[readonly]) svg { color: #5CFF85 !important; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .inline-block.backdrop-blur-sm.p-3 { border-radius: 0 !important; background: #000 !important; border: 1px solid rgb(51 255 102 / .35) !important; }
+  :root:not([fm-theme]:not([fm-theme="terminal"])) .inline-block.backdrop-blur-sm.p-3 * { color: #5CFF85 !important; font-family: "Cascadia Mono", Consolas, monospace !important; }
+
+}
+/* FM-THEME END content */

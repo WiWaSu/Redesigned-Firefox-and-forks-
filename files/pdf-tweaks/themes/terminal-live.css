@@ -1,0 +1,185 @@
+/* Redesigned Fox — тема «Terminal», подключается на лету */
+@-moz-document url-prefix("chrome://") {
+:root[fm-theme="terminal"][fm-theme], :root[fm-theme="terminal"][fm-theme] menupopup, :root[fm-theme="terminal"][fm-theme] panel, :root[fm-theme="terminal"][fm-theme] tooltip, :root[fm-theme="terminal"][fm-theme] #urlbar, :root[fm-theme="terminal"][fm-theme] .urlbarView {
+  --fm-accent: var(--fm-user-accent, #33FF66) !important;
+  --fm-on-accent: #000000 !important;
+  --fm-frame: #030603 !important;
+  --fm-bar: #081108 !important;
+  --fm-field: #000000 !important;
+  --fm-menu: #061006 !important;
+  --fm-ink: #5CFF85 !important;
+  --fm-muted: #2BA84C !important;
+  --fm-line: rgb(51 255 102 / .28) !important;
+  --fm-hover: rgb(51 255 102 / .1) !important;
+  --fm-press: rgb(51 255 102 / .18) !important;
+  --fm-soft: rgb(51 255 102 / .14) !important;
+  --fm-radius: 2px !important;
+  --fm-font: "Cascadia Mono", "Cascadia Code", Consolas, ui-monospace, monospace !important;
+  --fm-ring: color-mix(in srgb, var(--fm-accent) 40%, transparent) !important;
+  --fm-ring-focus: color-mix(in srgb, var(--fm-accent) 65%, transparent) !important;
+  --fm-ring-glow: color-mix(in srgb, var(--fm-accent) 10%, transparent) !important;
+  --panel-background-color: var(--fm-menu) !important;
+  --arrowpanel-background: var(--fm-menu) !important;
+  --panel-border-radius: 2px !important;
+  --arrowpanel-border-radius: 2px !important;
+  --menuitem-border-radius: 2px !important;
+  --arrowpanel-menuitem-border-radius: 2px !important;
+  --urlbarview-border-radius: 2px !important;
+  --toolbarbutton-border-radius: 2px !important;
+  --tab-border-radius: 2px !important;
+  --urlbarview-background-color-selected: var(--fm-soft) !important;
+}
+:root[fm-theme="terminal"][fm-theme]:not([inDOMFullscreen], [inFullscreen]) #tabbrowser-tabpanels .browserContainer { border-radius: var(--fm-radius) !important; }
+:root[fm-theme="terminal"][fm-theme] menupopup::part(content), :root[fm-theme="terminal"][fm-theme] panel::part(content) {
+  border-radius: 2px !important; background-color: var(--fm-menu) !important; background-image: none !important;
+}
+:root[fm-theme="terminal"][fm-theme] menupopup > :is(menuitem, menu), :root[fm-theme="terminal"][fm-theme] .subviewbutton, :root[fm-theme="terminal"][fm-theme] #appMenu-mainView .subviewbutton { border-radius: 2px !important; }
+:root[fm-theme="terminal"][fm-theme] .tabbrowser-tab > .tab-stack > .tab-background { border-radius: 2px !important; }
+:root[fm-theme="terminal"][fm-theme] #urlbar-background, :root[fm-theme="terminal"][fm-theme] .urlbar-background { border-radius: 2px !important; }
+:root[fm-theme="terminal"][fm-theme] #urlbar[open] > :is(#urlbar-background, .urlbar-background) { border-radius: 2px !important; }
+:root[fm-theme="terminal"][fm-theme] toolbar .toolbarbutton-1 > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack, .toolbarbutton-text), :root[fm-theme="terminal"][fm-theme] #PlacesToolbarItems > .bookmark-item, :root[fm-theme="terminal"][fm-theme] .urlbarView-row-inner, :root[fm-theme="terminal"][fm-theme] .tab-close-button { border-radius: 2px !important; }
+:root[fm-theme="terminal"][fm-theme] .urlbarView-favicon { border-radius: 2px !important; }
+:root[fm-theme="terminal"][fm-theme] #appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon {
+  border-radius: 2px !important; background: transparent !important;
+}
+:root[fm-theme="terminal"][fm-theme] moz-toggle { --toggle-background-color-pressed: var(--fm-accent) !important; }
+:root[fm-theme="terminal"][fm-theme] .fm-nowbar, :root[fm-theme="terminal"][fm-theme] .fm-toast { border-radius: 2px !important; }
+:root[fm-theme="terminal"][fm-theme] #appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon { box-shadow: none !important; }
+@media (prefers-color-scheme: light) {
+  :root[fm-theme="terminal"][fm-theme] #appMenu-mainView .subviewbutton:is(#appMenu-new-tab-button2, #appMenu-new-window-button2, #appMenu-new-classic-window-button, #appMenu-new-private-window-button2, #appMenu-history-button, #appMenu-bookmarks-button, #appMenu-downloads-button, #appMenu-passwords-button, #appMenu-extensions-themes-button, #appMenu-unified-extensions-button, #appMenu-print-button2, #appMenu-save-file-button2, #appMenu-translate-button, #appMenu-find-button2, #appMenu-settings-button, #appMenu-more-button2, #appMenu-help-button2, #appMenu-profiles-button, #appMenu-create-profile-button, #appMenu-tab-groups-button, #appMenu-quit-button2, #appMenu-fullscreen-button2) > .toolbarbutton-icon { filter: invert(1) !important; }
+}
+:root[fm-theme="terminal"][fm-theme] { color-scheme: dark !important; }
+:root[fm-theme="terminal"][fm-theme] #navigator-toolbox, :root[fm-theme="terminal"][fm-theme] menupopup, :root[fm-theme="terminal"][fm-theme] panel { text-shadow: 0 0 6px rgb(51 255 102 / .45); }
+:root[fm-theme="terminal"][fm-theme] toolbar .toolbarbutton-1 > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack) { fill: var(--fm-ink) !important; }
+:root[fm-theme="terminal"][fm-theme] .tabbrowser-tab[selected] > .tab-stack > .tab-background {
+  background: transparent !important; box-shadow: inset 0 0 0 1px var(--fm-accent), 0 0 12px rgb(51 255 102 / .25) !important;
+}
+:root[fm-theme="terminal"][fm-theme] .tabbrowser-tab[selected] .tab-label { color: var(--fm-accent) !important; }
+:root[fm-theme="terminal"][fm-theme] #urlbar-background, :root[fm-theme="terminal"][fm-theme] .urlbar-background { background: #000 !important; box-shadow: inset 0 0 0 1px var(--fm-line) !important; }
+:root[fm-theme="terminal"][fm-theme] #urlbar:is([focused], [open]) > :is(#urlbar-background, .urlbar-background) { box-shadow: inset 0 0 0 1px var(--fm-accent), 0 0 14px rgb(51 255 102 / .3) !important; }
+:root[fm-theme="terminal"][fm-theme] menupopup::part(content), :root[fm-theme="terminal"][fm-theme] panel::part(content) { border: 1px solid var(--fm-line) !important; }
+:root[fm-theme="terminal"][fm-theme] menupopup > :is(menuitem, menu):is([_moz-menuactive]):not([disabled]) { background: var(--fm-accent) !important; color: #000 !important; text-shadow: none; }
+}
+
+
+/* ---------------- Тема: Terminal ---------------- */
+@-moz-document url-prefix("about:"), url-prefix("chrome://browser/content/"), url-prefix("chrome://mozapps/"), url-prefix("chrome://global/content/") {
+  :root[fm-theme="terminal"][fm-theme] {
+    --fm-accent: var(--fm-user-accent, #33FF66) !important;
+    --fm-on-accent: #000000 !important;
+    --fm-frame: #030603 !important;
+    --fm-bar: #081108 !important;
+    --fm-field: #000000 !important;
+    --fm-menu: #061006 !important;
+    --fm-ink: #5CFF85 !important;
+    --fm-muted: #2BA84C !important;
+    --fm-line: rgb(51 255 102 / .28) !important;
+    --fm-hover: rgb(51 255 102 / .1) !important;
+    --fm-press: rgb(51 255 102 / .18) !important;
+    --fm-soft: rgb(51 255 102 / .14) !important;
+    --fm-radius: 2px !important;
+    --fm-font: "Cascadia Mono", "Cascadia Code", Consolas, ui-monospace, monospace !important;
+    --color-accent-primary: var(--fm-accent) !important;
+    --button-background-color-primary: var(--fm-accent) !important;
+    --button-text-color-primary: var(--fm-on-accent) !important;
+    --link-color: var(--fm-accent) !important;
+    --focus-outline-color: var(--fm-accent) !important;
+    --toggle-background-color-pressed: var(--fm-accent) !important;
+    --page-nav-button-background-color-selected: var(--fm-soft) !important;
+    --page-nav-button-text-color-selected: var(--fm-accent) !important;
+    --card-border-radius: 2px !important;
+    --box-border-radius: 2px !important;
+    --button-border-radius: 2px !important;
+    --input-text-border-radius: 2px !important;
+    --select-border-radius: 2px !important;
+    --page-nav-button-border-radius: 2px !important;
+  }
+  :root[fm-theme="terminal"][fm-theme] :is(setting-group, groupbox):not([hidden]), :root[fm-theme="terminal"][fm-theme] .card, :root[fm-theme="terminal"][fm-theme] .addon.card, :root[fm-theme="terminal"][fm-theme] moz-card { border-radius: 2px !important; }
+  :root[fm-theme="terminal"][fm-theme] button:not(.ghost-button):not([type="icon"]), :root[fm-theme="terminal"][fm-theme] select, :root[fm-theme="terminal"][fm-theme] menulist, :root[fm-theme="terminal"][fm-theme] input[type="search"], :root[fm-theme="terminal"][fm-theme] input[type="text"] { border-radius: 2px !important; }
+  :root[fm-theme="terminal"][fm-theme] .category, :root[fm-theme="terminal"][fm-theme] .page-nav-button { border-radius: 2px !important; }
+}
+
+@-moz-document url-prefix("chrome://noraneko-settings/") {
+  :root[fm-theme="terminal"][fm-theme], :root[fm-theme="terminal"][fm-theme][data-theme], :root[fm-theme="terminal"][fm-theme] .floorp-standard-ui {
+    --fm-accent: var(--fm-user-accent, #33FF66) !important;
+    --fm-on-accent: #000000 !important;
+    --fm-frame: #030603 !important;
+    --fm-bar: #081108 !important;
+    --fm-field: #000000 !important;
+    --fm-menu: #061006 !important;
+    --fm-ink: #5CFF85 !important;
+    --fm-muted: #2BA84C !important;
+    --fm-line: rgb(51 255 102 / .28) !important;
+    --fm-hover: rgb(51 255 102 / .1) !important;
+    --fm-press: rgb(51 255 102 / .18) !important;
+    --fm-soft: rgb(51 255 102 / .14) !important;
+    --fm-radius: 2px !important;
+    --fm-font: "Cascadia Mono", "Cascadia Code", Consolas, ui-monospace, monospace !important;
+    --floorp-brand: var(--fm-accent) !important;
+    --floorp-action: var(--fm-accent) !important;
+    --floorp-focus: var(--fm-accent) !important;
+    --floorp-switch-on: var(--fm-accent) !important;
+    --chakra-colors-purple-solid: var(--fm-accent) !important;
+    --chakra-colors-purple-fg: var(--fm-accent) !important;
+    --chakra-colors-purple-focus-ring: var(--fm-accent) !important;
+    --chakra-colors-purple-subtle: var(--fm-soft) !important;
+  }
+}
+
+@-moz-document url-prefix("chrome://noraneko-newtab/"), url("about:newtab"), url("about:home") {
+
+  html[fm-theme="terminal"][fm-theme] { background: #010301 !important; }
+  /* экран старого монитора: строки развёртки и свечение */
+  :root[fm-theme="terminal"][fm-theme] #root::before {
+    animation: none !important; inset: 0 !important;
+    background:
+      repeating-linear-gradient(180deg, rgb(0 0 0 / .35) 0 1px, transparent 1px 3px),
+      radial-gradient(80% 70% at 50% 45%, rgb(20 80 35 / .55), transparent 75%),
+      #010301 !important;
+  }
+  :root[fm-theme="terminal"][fm-theme] #root::after { content: "" !important; position: fixed !important; inset: 0 !important; z-index: -1 !important; pointer-events: none !important;
+    background: radial-gradient(120% 100% at 50% 50%, transparent 60%, rgb(0 0 0 / .8)) !important; }
+  :root[fm-theme="terminal"][fm-theme] .absolute.top-4.right-4 .tabular-nums {
+    font-family: "Cascadia Mono", Consolas, monospace !important; font-weight: 400 !important;
+    font-size: clamp(90px, 11vw, 160px) !important; color: #5CFF85 !important;
+    text-shadow: 0 0 10px rgb(51 255 102 / .8), 0 0 40px rgb(51 255 102 / .35) !important;
+  }
+  :root[fm-theme="terminal"][fm-theme] .absolute.top-4.right-4 .tabular-nums::after { content: "_"; animation: fm-blink 1.1s steps(1) infinite; }
+  :root[fm-theme="terminal"][fm-theme] .absolute.top-4.right-4 .tabular-nums > .animate-pulse { animation: none !important; opacity: 1 !important; }
+  :root[fm-theme="terminal"][fm-theme] .absolute.top-4.right-4 .flex-col.text-right > div { font-family: "Cascadia Mono", Consolas, monospace !important; color: #2BA84C !important; text-transform: uppercase; letter-spacing: .15em; }
+  :root[fm-theme="terminal"][fm-theme] .absolute.top-4.right-4 .flex-col.text-right > div:first-child::before { content: "> "; }
+  :root[fm-theme="terminal"][fm-theme] .group.cursor-pointer:has(input[readonly]) {
+    border-radius: 0 !important; background: #000 !important; border: 1px solid rgb(51 255 102 / .5) !important;
+    box-shadow: 0 0 18px rgb(51 255 102 / .2) !important;
+  }
+  :root[fm-theme="terminal"][fm-theme] .group.cursor-pointer:has(input[readonly]) input { font-family: "Cascadia Mono", Consolas, monospace !important; color: #5CFF85 !important; }
+  :root[fm-theme="terminal"][fm-theme] .group.cursor-pointer:has(input[readonly]) input::placeholder { color: #2BA84C !important; }
+  :root[fm-theme="terminal"][fm-theme] .group.cursor-pointer:has(input[readonly]) svg { color: #5CFF85 !important; }
+  :root[fm-theme="terminal"][fm-theme] .inline-block.backdrop-blur-sm.p-3 { border-radius: 0 !important; background: #000 !important; border: 1px solid rgb(51 255 102 / .35) !important; }
+  :root[fm-theme="terminal"][fm-theme] .inline-block.backdrop-blur-sm.p-3 * { color: #5CFF85 !important; font-family: "Cascadia Mono", Consolas, monospace !important; }
+
+}
+
+
+/* ---------------- Тема: Terminal ---------------- */
+:root[fm-theme="terminal"][fm-theme]:has(#outerContainer #viewerContainer) {
+  & {
+    --x-accent: var(--fm-user-accent, #33FF66) !important;
+    --x-on-accent: #000000 !important;
+    --x-ground: #030603 !important;
+    --x-rail: #030603 !important;
+    --x-bar: #081108 !important;
+    --x-well: #000000 !important;
+    --x-field: #000000 !important;
+    --x-line: rgb(51 255 102 / .28) !important;
+    --x-ink: #5CFF85 !important;
+    --x-muted: #2BA84C !important;
+    --x-radius: 10px !important;
+  }
+  & #toolbarViewerLeft,
+  & #toolbarViewerMiddle,
+  & #editorModeButtons,
+  & #toolbarViewerRight > .toolbarHorizontalGroup:not(#editorModeButtons) { border-radius: 2px !important; }
+  & .toolbarButton:not(.labeled) { border-radius: 2px !important; }
+}
+

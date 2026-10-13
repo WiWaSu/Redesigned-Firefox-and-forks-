@@ -1,7 +1,8 @@
-/* Floorp Modern Studio — страница настроек.
+/* Redesigned Fox Studio — страница настроек.
  * Получает текущие настройки от браузера (событие fm-studio-config) и
  * отправляет изменения обратно (fm-studio-save). Применяет их сам браузер. */
 import { SCHEMA, PRESETS, sanitize } from "./FloorpModernStudio.sys.mjs";
+import { THEMES } from "./FloorpModernThemes.sys.mjs";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const mk = (tag, cls, text) => {
@@ -11,7 +12,7 @@ const mk = (tag, cls, text) => {
   return e;
 };
 // значения по умолчанию для переключателей (null = как в теме)
-const BOOL_DEFAULT = { ctrlTabPreview: false };
+const BOOL_DEFAULT = { ctrlTabPreview: false, square: false };
 
 let cfg = {};
 let connected = false;
@@ -21,13 +22,17 @@ const controls = new Map();
    Открыта как chrome://fmstudio/ — у страницы есть права браузера, пишем настройки сами.
    Открыта как resource:// — через события, их передаёт актор FloorpPdfTweaks. */
 let direct = null;
+let themesApi = null;
 try {
   if (typeof ChromeUtils !== "undefined") {
     direct = ChromeUtils.importESModule("resource://pdftweaks/FloorpModernStudio.sys.mjs");
+    themesApi = ChromeUtils.importESModule("resource://pdftweaks/FloorpModernThemes.sys.mjs");
   }
 } catch {
   direct = null;
+  themesApi = null;
 }
+let theme = "";
 let saveTimer = 0;
 function save(now = false) {
   clearTimeout(saveTimer);
@@ -51,6 +56,8 @@ window.addEventListener("fm-studio-config", e => {
     const d = JSON.parse(e.detail || "{}");
     cfg = sanitize(d.config || {});
     if (d.version) $("#ver").textContent = "· версия " + d.version;
+    if (d.theme) theme = d.theme;
+    markTheme();
   } catch {
     cfg = {};
   }
@@ -93,6 +100,16 @@ function row(it) {
   return r;
 }
 
+// Firefox при восстановлении вкладки сам заполняет поля формы и шлёт события —
+// принимаем изменения только от элементов, которых пользователь реально касался
+function touchable(el) {
+  el.setAttribute("autocomplete", "off");
+  const mark = () => (el.dataset.touched = "1");
+  el.addEventListener("pointerdown", mark);
+  el.addEventListener("keydown", mark);
+  return () => el.dataset.touched === "1";
+}
+
 function buildControl(it) {
   const r = row(it);
   let update;
@@ -104,9 +121,11 @@ function buildControl(it) {
     hex.maxLength = 7;
     hex.spellcheck = false;
     const theme = mk("span", "badge", "тема");
-    input.addEventListener("input", () => set(it.key, input.value.toUpperCase()));
+    const tColor = touchable(input);
+    const tHex = touchable(hex);
+    input.addEventListener("input", () => tColor() && set(it.key, input.value.toUpperCase()));
     hex.addEventListener("change", () => {
-      if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) set(it.key, hex.value.toUpperCase());
+      if (tHex() && /^#[0-9a-fA-F]{6}$/.test(hex.value)) set(it.key, hex.value.toUpperCase());
     });
     wrap.append(input, hex, theme);
     r.append(wrap);
@@ -124,7 +143,9 @@ function buildControl(it) {
     input.max = it.max;
     input.step = it.step;
     const out = mk("output");
+    const tRange = touchable(input);
     input.addEventListener("input", () => {
+      if (!tRange()) return;
       out.textContent = input.value + (it.unit || "");
       set(it.key, Number(input.value));
     });
@@ -180,7 +201,8 @@ function buildControl(it) {
   } else if (it.type === "text") {
     const input = mk("input", "text");
     input.placeholder = "например, JetBrains Mono";
-    input.addEventListener("change", () => set(it.key, input.value.trim() || null));
+    const tText = touchable(input);
+    input.addEventListener("change", () => tText() && set(it.key, input.value.trim() || null));
     r.append(input);
     update = v => {
       input.value = v || "";
@@ -228,6 +250,36 @@ const io = new IntersectionObserver(entries => {
   }
 }, { rootMargin: "-40% 0px -55% 0px" });
 for (const s of groups.children) io.observe(s);
+
+/* ---------- тема: меняется сразу во всём браузере ---------- */
+const themeRow = $("#themes");
+function markTheme() {
+  for (const b of themeRow.children) b.toggleAttribute("on", b.dataset.id === theme);
+}
+for (const [id, name, sw] of THEMES) {
+  const b = mk("button", "theme");
+  b.dataset.id = id;
+  const pv = mk("span", "theme-pv");
+  pv.style.setProperty("--a", sw[0]);
+  pv.style.setProperty("--b", sw[1]);
+  pv.style.setProperty("--c", sw[2]);
+  pv.style.setProperty("--d", sw[3]);
+  pv.append(mk("i"), mk("i"), mk("i"));
+  b.append(pv, mk("span", "theme-name", name));
+  b.addEventListener("click", async () => {
+    theme = id;
+    markTheme();
+    try {
+      if (themesApi) await themesApi.setTheme(id);
+      else window.dispatchEvent(new CustomEvent("fm-theme-set", { detail: id }));
+      toast(`Тема «${name}»`);
+    } catch (e) {
+      console.error(e);
+      toast("Не получилось сменить тему");
+    }
+  });
+  themeRow.append(b);
+}
 
 const presetRow = $("#presets");
 for (const [id, name, values] of PRESETS) {
@@ -278,6 +330,10 @@ refreshAll();
 if (direct) {
   connected = true;
   cfg = sanitize(direct.readConfig());
+  try {
+    theme = themesApi.current();
+  } catch {}
+  markTheme();
   try {
     $("#ver").textContent = "· версия " + direct.version();
   } catch {}

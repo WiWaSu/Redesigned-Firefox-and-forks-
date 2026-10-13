@@ -68,7 +68,21 @@ export class FloorpPdfTweaksChild extends JSWindowActorChild {
       return null;
     }
     const { action, delta } = msg.data || {};
+    // звуки на странице + «невидимые» плееры, которых нет в разметке (Telegram создаёт new Audio())
     const media = [...doc.querySelectorAll("audio, video")];
+    try {
+      const list = win.wrappedJSObject.__fmMediaList;
+      if (list) {
+        for (const ref of [...list]) {
+          const m = ref.deref();
+          if (!m) {
+            list.delete(ref);
+          } else if (!media.includes(m)) {
+            media.push(m);
+          }
+        }
+      }
+    } catch {}
     const text = sel => {
       for (const s of sel) {
         const t = doc.querySelector(s)?.textContent?.trim();
@@ -104,7 +118,7 @@ export class FloorpPdfTweaksChild extends JSWindowActorChild {
           title: title.slice(0, 120),
           artist: artist.slice(0, 80),
           artwork: artwork.slice(0, 2000),
-          playing: media.some(x => !x.paused),
+          playing: media.some(x => !x.paused && !x.ended && !x.muted && x.volume > 0 && x.readyState > 2),
           position: m ? m.currentTime : 0,
           duration: m ? m.duration : 0,
         };
@@ -112,7 +126,8 @@ export class FloorpPdfTweaksChild extends JSWindowActorChild {
       if (action === "pause") {
         let count = 0;
         for (const m of media) {
-          if (!m.paused) {
+          // слышимый звук: играет, не заглушён и громкость не ноль
+          if (!m.paused && !m.ended) {
             m.setAttribute("data-fm-paused", "1");
             m.pause();
             count++;
@@ -161,6 +176,18 @@ export class FloorpPdfTweaksChild extends JSWindowActorChild {
     const doc = this.document;
     if (!doc || event.target !== doc) {
       return;
+    }
+    // сайты, где звук играет из плееров вне разметки — запоминаем их, чтобы Now Bar мог поставить паузу
+    try {
+      this.#trackMedia();
+    } catch (e) {
+      console.error("[pdf-tweaks] media track:", e);
+    }
+    // атрибут fm-theme: по нему включается выбранная в браузере тема (без перезапуска)
+    try {
+      this.markTheme();
+    } catch (e) {
+      console.error("[pdf-tweaks] theme mark:", e);
     }
     // страница Floorp Modern Studio: отдаём ей настройки и принимаем изменения
     try {
@@ -247,7 +274,79 @@ export class FloorpPdfTweaksChild extends JSWindowActorChild {
     this.#timer = 0;
   }
 
+  /* Плееры вне разметки (new Audio() в Telegram, VK и т. п.) не видны через querySelectorAll.
+     На таких сайтах подменяем HTMLMediaElement.prototype.play: каждый запущенный звук
+     попадает в список (слабые ссылки), и Now Bar может его остановить. */
+  #trackMedia() {
+    const win = this.contentWindow;
+    let host = "";
+    try {
+      host = win.location.hostname;
+    } catch {}
+    if (!/(^|\.)(telegram\.org|t\.me|vk\.com|vk\.ru|ok\.ru|music\.yandex\.(ru|com|by|kz)|zvuk\.com|soundcloud\.com|discord\.com|whatsapp\.com)$/.test(host)) {
+      return;
+    }
+    const w = win.wrappedJSObject;
+    if (!w || w.__fmMediaList) {
+      return;
+    }
+    const sb = Cu.Sandbox(win, { sandboxPrototype: win, wantXrays: false, sameZoneAs: win });
+    Cu.evalInSandbox(`(function () {
+      const P = HTMLMediaElement.prototype, orig = P.play, list = new Set();
+      Object.defineProperty(window, "__fmMediaList", { value: list });
+      P.play = function play() {
+        try {
+          for (const r of list) { if (r.deref() === this) { return orig.apply(this, arguments); } }
+          if (list.size > 200) { list.clear(); }
+          list.add(new WeakRef(this));
+        } catch (e) {}
+        return orig.apply(this, arguments);
+      };
+    })();`, sb);
+  }
+
+  /* Тема Redesigned Fox для страниц браузера и PDF: fm-theme="<id>" на <html> */
+  #themeObserver = null;
+  markTheme() {
+    const doc = this.document;
+    const root = doc?.documentElement;
+    if (!root || this.#themeObserver) {
+      return;
+    }
+    let href = "";
+    try {
+      href = String(this.contentWindow?.location?.href || "");
+    } catch {}
+    let ours = /^(about:(?!blank|srcdoc)|chrome:\/\/|resource:\/\/)/.test(href);
+    if (!ours) {
+      try {
+        ours = doc.nodePrincipal.originNoSuffix === "resource://pdf.js" || doc.nodePrincipal.isSystemPrincipal;
+      } catch {}
+    }
+    if (!ours) {
+      return;
+    }
+    const sync = () => {
+      let id = "";
+      try {
+        id = Services.prefs.getStringPref("floorp.modern.theme", "");
+      } catch {}
+      if (/^[a-z]{2,16}$/.test(id)) {
+        root.setAttribute("fm-theme", id);
+      }
+    };
+    this.#themeObserver = { observe: sync };
+    Services.prefs.addObserver("floorp.modern.theme", this.#themeObserver);
+    sync();
+  }
+
   didDestroy() {
+    if (this.#themeObserver) {
+      try {
+        Services.prefs.removeObserver("floorp.modern.theme", this.#themeObserver);
+      } catch {}
+      this.#themeObserver = null;
+    }
     this.#ac?.abort();
     this.#clearTimer();
     if (this.#prefObserver) {
@@ -318,8 +417,18 @@ export class FloorpPdfTweaksChild extends JSWindowActorChild {
       try {
         version = Services.prefs.getStringPref("floorp.modern.version", "");
       } catch {}
-      win.dispatchEvent(new win.CustomEvent("fm-studio-config", { detail: JSON.stringify({ config, version }) }));
+      let theme = "";
+      try {
+        theme = Services.prefs.getStringPref("floorp.modern.theme", "");
+      } catch {}
+      win.dispatchEvent(new win.CustomEvent("fm-studio-config", { detail: JSON.stringify({ config, version, theme }) }));
     };
+    win.addEventListener("fm-theme-set", e => {
+      const id = String(e.detail || "");
+      if (/^[a-z]{2,16}$/.test(id)) {
+        this.sendAsyncMessage("PdfTweaks:theme-set", id);
+      }
+    });
     win.addEventListener("fm-studio-save", e => {
       const text = String(e.detail || "");
       if (text.length < 20000) {
@@ -1789,6 +1898,12 @@ export class FloorpModernNTChild extends FloorpPdfTweaksChild {
     } catch {}
     // обычные страницы и PDF обслуживает основной актор — здесь только страницы браузера
     if (!/^chrome:\/\/(noraneko-newtab|fmstudio)\//.test(href)) {
+      // остальным окнам и страницам браузера (боковая панель, библиотека, настройки Floorp) — только тема
+      if (event.type === "DOMContentLoaded" && href.startsWith("chrome://") && event.target === this.document) {
+        try {
+          this.markTheme();
+        } catch {}
+      }
       return;
     }
     super.handleEvent(event);

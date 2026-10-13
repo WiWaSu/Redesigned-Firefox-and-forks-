@@ -1,0 +1,122 @@
+[
+ {
+  "id": "oneui",
+  "name": "One UI",
+  "swatch": [
+   "#0f1012",
+   "#1c1d21",
+   "#3e91ff",
+   "#f2f3f5"
+  ]
+ },
+ {
+  "id": "ios",
+  "name": "iOS Liquid Glass",
+  "swatch": [
+   "#05060b",
+   "#1c1c1e",
+   "#0a84ff",
+   "#ffffff"
+  ]
+ },
+ {
+  "id": "material",
+  "name": "Material You",
+  "swatch": [
+   "#131418",
+   "#1d2027",
+   "#a8c7fa",
+   "#e4e2e6"
+  ]
+ },
+ {
+  "id": "fluent",
+  "name": "Windows 11",
+  "swatch": [
+   "#202020",
+   "#2b2b2b",
+   "#4cc2ff",
+   "#ffffff"
+  ]
+ },
+ {
+  "id": "macos",
+  "name": "macOS",
+  "swatch": [
+   "#1e1e1e",
+   "#2c2c2e",
+   "#0a84ff",
+   "#f5f5f7"
+  ]
+ },
+ {
+  "id": "nothing",
+  "name": "Nothing",
+  "swatch": [
+   "#000000",
+   "#111111",
+   "#d71921",
+   "#ffffff"
+  ]
+ },
+ {
+  "id": "nightdrive",
+  "name": "Night Drive",
+  "swatch": [
+   "#07080d",
+   "#151822",
+   "#ffb25b",
+   "#eef0f6"
+  ]
+ },
+ {
+  "id": "aero",
+  "name": "Aero",
+  "swatch": [
+   "#163a6b",
+   "#1d4a85",
+   "#5ab0ff",
+   "#ffffff"
+  ]
+ },
+ {
+  "id": "retro",
+  "name": "Retro 98",
+  "swatch": [
+   "#008080",
+   "#c0c0c0",
+   "#000080",
+   "#000000"
+  ]
+ },
+ {
+  "id": "terminal",
+  "name": "Terminal",
+  "swatch": [
+   "#030803",
+   "#081108",
+   "#33ff66",
+   "#b7ffc4"
+  ]
+ },
+ {
+  "id": "paper",
+  "name": "Paper",
+  "swatch": [
+   "#f3eee3",
+   "#fbf8f1",
+   "#b4532a",
+   "#2b2620"
+  ]
+ },
+ {
+  "id": "cyber",
+  "name": "Cyberpunk",
+  "swatch": [
+   "#0a0612",
+   "#15111f",
+   "#ff00aa",
+   "#f3f0ff"
+  ]
+ }
+]
